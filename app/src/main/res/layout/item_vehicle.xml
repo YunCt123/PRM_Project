@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Vehicle Image -->
+        <ImageView
+            android:id="@+id/iv_vehicle_image"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/xe3"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Vehicle Info Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_vehicle_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tesla Model 3"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_900" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_rating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.8"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_600"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="★"
+                    android:textColor="@color/yellow_400"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <!-- Vehicle Details -->
+        <TextView
+            android:id="@+id/tv_vehicle_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2022 • Tesla • Sedan"
+            android:textSize="14sp"
+            android:textColor="@color/gray_500"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Battery and Range -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tv_battery_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="85%"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_green" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="358 km range"
+                android:textSize="14sp"
+                android:textColor="@color/gray_600" />
+
+        </LinearLayout>
+
+        <!-- Location and Seats -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👥 5 Seats"
+                android:textSize="14sp"
+                android:textColor="@color/gray_600" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:text="📍 District 7 Station"
+                android:textSize="14sp"
+                android:textColor="@color/gray_600" />
+
+        </LinearLayout>
+
+        <!-- Status Badge -->
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available"
+            android:textSize="12sp"
+            android:textColor="@color/primary_green"
+            android:background="@color/light_green"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Price and Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$18"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue" />
+
+                <TextView
+                    android:id="@+id/tv_price_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="/hour • $150/day"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_500" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btn_view_details"
+                    android:layout_width="100dp"
+                    android:layout_height="36dp"
+                    android:text="View Details"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btn_book_now"
+                    android:layout_width="100dp"
+                    android:layout_height="36dp"
+                    android:text="Book Now"
+                    android:textSize="12sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_green" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

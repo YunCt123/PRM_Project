@@ -1,22 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true"
     tools:context=".ui.home.HomeFragment">
 
-    <TextView
-        android:id="@+id/text_home"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical">
+
+        <!-- Hero Section Component -->
+        <include layout="@layout/component_hero_section" />
+
+        <!-- Search Form -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Find Your Perfect EV"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/gray_900"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Pickup Location -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pickup Location"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/gray_700"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_pickup_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Enter location..."
+                    android:textSize="14sp"
+                    android:paddingHorizontal="16dp"
+                    android:drawableStart="@drawable/ic_location_24dp"
+                    android:drawablePadding="12dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Date Selection -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pickup Date"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/gray_700"
+                            android:layout_marginBottom="8dp" />
+
+                        <EditText
+                            android:id="@+id/et_pickup_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="dd/mm/yyyy"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="16dp"
+                            android:drawableStart="@drawable/ic_calendar_24dp"
+                            android:drawablePadding="12dp"
+                            android:focusable="false" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Return Date"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/gray_700"
+                            android:layout_marginBottom="8dp" />
+
+                        <EditText
+                            android:id="@+id/et_return_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="dd/mm/yyyy"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="16dp"
+                            android:drawableStart="@drawable/ic_calendar_24dp"
+                            android:drawablePadding="12dp"
+                            android:focusable="false" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Search Button -->
+                <Button
+                    android:id="@+id/btn_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="🔍 Find Available Vehicles"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_button_green" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Features Component -->
+        <include layout="@layout/component_features" />
+
+        <!-- Vehicles List -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Available Vehicles"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_900"
+                android:layout_marginBottom="16dp" />
+
+            <!-- RecyclerView for vehicles -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_vehicles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_vehicle" />
+
+        </LinearLayout>
+
+        <!-- Stats Component -->
+        <include layout="@layout/component_stats" />
+
+        <!-- Bottom Spacer for Navigation -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="80dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
