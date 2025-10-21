@@ -2,5 +2,5 @@
     <string name="app_name">PRM_Project</string>
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
-    <string name="title_setting">Setting</string>
+    <string name="title_profile">Profile</string>
 </resources>
