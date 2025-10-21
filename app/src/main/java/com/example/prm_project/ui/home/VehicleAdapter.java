@@ -1,6 +1,7 @@
 package com.example.prm_project.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,21 +46,58 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.tvPriceDetails.setText(vehicle.getPriceDetails());
         holder.tvStatus.setText(vehicle.getStatus());
 
-        // Set click listeners for buttons
-        holder.btnViewDetails.setOnClickListener(v -> {
-            Toast.makeText(context, "View details for " + vehicle.getName(), Toast.LENGTH_SHORT).show();
-            // Navigate to vehicle details screen
-        });
-
-        holder.btnBookNow.setOnClickListener(v -> {
-            Toast.makeText(context, "Booking " + vehicle.getName(), Toast.LENGTH_SHORT).show();
-            // Navigate to booking screen
-        });
-
-        // Set vehicle image based on position
+        // Set vehicle image based on position (DEFINE FIRST)
         int[] vehicleImages = {R.drawable.xe1, R.drawable.xe2, R.drawable.xe3};
         int imageIndex = position % vehicleImages.length;
         holder.ivVehicleImage.setImageResource(vehicleImages[imageIndex]);
+
+        // Set click listeners for buttons
+        holder.btnViewDetails.setOnClickListener(v -> {
+            // Navigate to DetailActivity with vehicle data
+            Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
+            
+            // Pass vehicle data via intent
+            intent.putExtra("vehicle_name", vehicle.getName());
+            intent.putExtra("vehicle_details", vehicle.getDetails());
+            intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
+            intent.putExtra("vehicle_range", vehicle.getRange());
+            intent.putExtra("vehicle_seats", vehicle.getSeats());
+            intent.putExtra("vehicle_location", vehicle.getLocation());
+            intent.putExtra("vehicle_price", vehicle.getPrice());
+            intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
+            intent.putExtra("vehicle_status", vehicle.getStatus());
+            intent.putExtra("vehicle_rating", vehicle.getRating());
+            intent.putExtra("vehicle_condition", vehicle.getCondition());
+            intent.putExtra("vehicle_image", vehicleImages[imageIndex]);
+            
+            context.startActivity(intent);
+        });
+
+        holder.btnBookNow.setOnClickListener(v -> {
+            Toast.makeText(context, "Booking " + vehicle.getName() + "...", Toast.LENGTH_SHORT).show();
+            // TODO: Navigate to booking scr1een
+        });
+
+        // Set click listener for entire card
+        holder.itemView.setOnClickListener(v -> {
+            // Same navigation as VIEW button
+            Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
+            
+            intent.putExtra("vehicle_name", vehicle.getName());
+            intent.putExtra("vehicle_details", vehicle.getDetails());
+            intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
+            intent.putExtra("vehicle_range", vehicle.getRange());
+            intent.putExtra("vehicle_seats", vehicle.getSeats());
+            intent.putExtra("vehicle_location", vehicle.getLocation());
+            intent.putExtra("vehicle_price", vehicle.getPrice());
+            intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
+            intent.putExtra("vehicle_status", vehicle.getStatus());
+            intent.putExtra("vehicle_rating", vehicle.getRating());
+            intent.putExtra("vehicle_condition", vehicle.getCondition());
+            intent.putExtra("vehicle_image", vehicleImages[imageIndex]);
+            
+            context.startActivity(intent);
+        });
     }
 
     @Override
