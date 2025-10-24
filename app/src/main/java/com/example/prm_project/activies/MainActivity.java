@@ -1,8 +1,11 @@
-package com.example.prm_project;
+package com.example.prm_project.activies;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.prm_project.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -36,7 +40,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         // Removed setupActionBarWithNavController to hide status bar titles
+
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+
+
     }
 
 }
