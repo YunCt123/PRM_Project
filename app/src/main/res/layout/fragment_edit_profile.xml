@@ -1,180 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/ivAvatarEdit"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/user"
+        android:contentDescription="@string/profile_avatar"
+        android:layout_gravity="center" />
+
+    <!-- Added editable name and email fields -->
+    <EditText
+        android:id="@+id/etFullName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:hint="@string/full_name_hint"
+        android:inputType="textPersonName"
+        android:autofillHints="name"
+        android:importantForAutofill="yes"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:layout_marginTop="16dp" />
 
-        <!-- Top bar -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp">
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        android:autofillHints="emailAddress"
+        android:importantForAutofill="yes"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:layout_marginTop="8dp" />
 
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentStart="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/chevron_desc"
-                android:src="@drawable/ic_arrow_back_black_24dp" />
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/password_label"
+        android:inputType="textPassword"
+        android:autofillHints="password"
+        android:importantForAutofill="yes"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:maxWidth="600dp"
+        android:minWidth="240dp"
+        android:layout_gravity="center_horizontal" />
 
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="@string/title_edit_profile"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+    <ImageButton
+        android:id="@+id/ivTogglePassword"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_visibility_off_24dp"
+        android:contentDescription="@string/toggle_password"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="end"
+        android:minHeight="48dp"
+        android:minWidth="48dp" />
 
-            <ImageButton
-                android:id="@+id/btnSave"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/edit"
-                android:src="@drawable/ic_check_black_24dp" />
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_save"
+        android:minHeight="48dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center" />
 
-        </RelativeLayout>
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_back"
+        android:minHeight="48dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center" />
 
-        <!-- Avatar -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/ivAvatarEdit"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/user"
-                android:contentDescription="@string/profile_avatar"
-                android:scaleType="centerCrop"
-                android:background="@drawable/bg_circle_light"
-                android:padding="6dp" />
-
-            <ImageView
-                android:id="@+id/ivAvatarCamera"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="end|bottom"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:src="@drawable/ic_camera_alt_24dp"
-                android:contentDescription="@string/edit" />
-
-        </FrameLayout>
-
-        <!-- Form fields -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Name"
-            android:textStyle="bold"
-            android:layout_marginTop="8dp" />
-
-        <EditText
-            android:id="@+id/etName"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Charlotte king"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="E mail address"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="@johnkinggraphics.gmail.com"
-            android:padding="12dp"
-            android:inputType="textEmailAddress"
-            android:background="@android:drawable/edit_text" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="User name"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/etUsername"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="@johnkinggraphics"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Password"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp">
-
-            <EditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="*************"
-                android:padding="12dp"
-                android:inputType="textPassword"
-                android:background="@android:drawable/edit_text" />
-
-            <ImageButton
-                android:id="@+id/ivTogglePassword"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_visibility_off_24dp"
-                android:contentDescription="@string/passwords_icon_desc" />
-
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Phone number"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/etPhone"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="+91 6895312"
-            android:padding="12dp"
-            android:inputType="phone"
-            android:background="@android:drawable/edit_text" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="24dp" />
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

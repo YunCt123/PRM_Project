@@ -43,4 +43,8 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<Integer> getRidesCount() { return ridesCount; }
     public LiveData<Integer> getFavCount() { return favCount; }
     public LiveData<Integer> getReviewsCount() { return reviewsCount; }
+
+    // Setters so other fragments can update profile info (kept in-memory for now)
+    public void setName(String newName) { name.setValue(newName); }
+    public void setEmail(String newEmail) { email.setValue(newEmail); }
 }

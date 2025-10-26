@@ -20,8 +20,9 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        // Use activity-scoped ViewModel so EditProfileFragment can share updates
         ProfileViewModel profileViewModel =
-                new ViewModelProvider(this).get(ProfileViewModel.class);
+                new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -40,23 +41,28 @@ public class ProfileFragment extends Fragment {
         });
 
         // Menu click handlers (temporary: show a toast)
-        binding.llAddress.setOnClickListener(v ->
-                Toast.makeText(getContext(), getString(R.string.my_address), Toast.LENGTH_SHORT).show());
+        binding.llMyProfile.setOnClickListener(v ->
+                NavHostFragment.findNavController(ProfileFragment.this)
+                        .navigate(R.id.navigation_edit_profile));
 
-        binding.llAccount.setOnClickListener(v ->
-                Toast.makeText(getContext(), getString(R.string.account), Toast.LENGTH_SHORT).show());
+        binding.llSettings.setOnClickListener(v ->
+                NavHostFragment.findNavController(ProfileFragment.this)
+                        .navigate(R.id.navigation_settings));
 
         binding.llNotifications.setOnClickListener(v ->
                 Toast.makeText(getContext(), getString(R.string.notifications), Toast.LENGTH_SHORT).show());
 
-        binding.llDevices.setOnClickListener(v ->
-                Toast.makeText(getContext(), getString(R.string.devices), Toast.LENGTH_SHORT).show());
+        binding.llTransactions.setOnClickListener(v ->
+                Toast.makeText(getContext(), getString(R.string.transaction_history), Toast.LENGTH_SHORT).show());
 
-        binding.llPasswords.setOnClickListener(v ->
-                Toast.makeText(getContext(), getString(R.string.passwords), Toast.LENGTH_SHORT).show());
+        binding.llFAQ.setOnClickListener(v ->
+                Toast.makeText(getContext(), getString(R.string.faq), Toast.LENGTH_SHORT).show());
 
-        binding.llLanguage.setOnClickListener(v ->
-                Toast.makeText(getContext(), getString(R.string.language), Toast.LENGTH_SHORT).show());
+        binding.llAbout.setOnClickListener(v ->
+                Toast.makeText(getContext(), getString(R.string.about_app), Toast.LENGTH_SHORT).show());
+
+        binding.llLogout.setOnClickListener(v ->
+                Toast.makeText(getContext(), getString(R.string.logout), Toast.LENGTH_SHORT).show());
 
         return root;
     }
