@@ -10,12 +10,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_project.R;
+import com.example.prm_project.ui.booking.BookingActivity;
 import com.example.prm_project.ui.home.Vehicle;
 
 public class DetailActivity extends AppCompatActivity {
 
     private Vehicle vehicle;
-    
+    private int vehicleImageRes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,8 +45,8 @@ public class DetailActivity extends AppCompatActivity {
                 intent.getStringExtra("vehicle_condition")
             );
             
-            int vehicleImageRes = intent.getIntExtra("vehicle_image", R.drawable.xe1);
-            
+            vehicleImageRes = intent.getIntExtra("vehicle_image", R.drawable.xe1);
+
             setupViews(vehicleImageRes);
         }
     }
@@ -78,8 +80,12 @@ public class DetailActivity extends AppCompatActivity {
 
         // Set click listeners
         btnBookNow.setOnClickListener(v -> {
-            Toast.makeText(this, "Booking " + vehicle.getName() + "...", Toast.LENGTH_SHORT).show();
-            // TODO: Navigate to booking screen
+            // Navigate to BookingActivity
+            Intent bookingIntent = new Intent(DetailActivity.this, BookingActivity.class);
+            bookingIntent.putExtra("vehicle_name", vehicle.getName());
+            bookingIntent.putExtra("vehicle_price", vehicle.getPrice());
+            bookingIntent.putExtra("vehicle_image", vehicleImageRes);
+            startActivity(bookingIntent);
         });
 
         btnBack.setOnClickListener(v -> {
