@@ -44,6 +44,44 @@
     <string name="sample_vehicle_details">2022 • Tesla • Sedan</string>
     <string name="sample_price">$18</string>
     <string name="view_label">View</string>
+
+    <!-- Profile & Edit Profile strings -->
+    <string name="chevron_desc">Chevron icon</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="edit">Edit</string>
+    <string name="profile_avatar">Profile Avatar</string>
+    <string name="passwords_icon_desc">Passwords Icon</string>
+    <string name="profile_cover_desc">Profile Cover</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="profile_subtitle">Subtitle</string>
+    <string name="my_address_icon_desc">Address Icon</string>
+    <string name="my_address">My Address</string>
+    <string name="account_icon_desc">Account Icon</string>
+    <string name="account">Account</string>
+    <string name="notifications_icon_desc">Notifications Icon</string>
+    <string name="notifications">Notifications</string>
+    <string name="devices_icon_desc">Devices Icon</string>
+    <string name="devices">Devices</string>
+    <string name="passwords">Passwords</string>
+    <string name="language_icon_desc">Language Icon</string>
+    <string name="language">Language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="english">English</string>
+
+    <!-- Strings used by fragment_profile.xml (added) -->
+    <string name="my_profile">My Profile</string>
+    <string name="settings">Settings</string>
+    <string name="transaction_history">Transaction History</string>
+    <string name="faq">FAQ</string>
+    <string name="about_app">About App</string>
+    <string name="logout">Logout</string>
+
+    <!-- Strings added to fix layout warnings -->
+    <string name="btn_save">Save</string>
+    <string name="btn_back">Back</string>
+    <string name="password_label">Password</string>
+    <string name="toggle_password">Toggle password visibility</string>
+</resources>
     <string name="terms_and_conditions_agreement"><![CDATA[I agree to the <a href="https://example.com/terms">terms and conditions</a> and <a href="https://example.com/privacy">privacy agreement</a>]]></string>
     <string name="insurance_terms"><![CDATA[Insurance & Terms]]></string>
     <string name="enter_your_full_name">Enter your full name</string>
