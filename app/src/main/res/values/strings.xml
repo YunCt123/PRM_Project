@@ -3,42 +3,45 @@
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_profile">Profile</string>
+    <string name="login">Login</string>
 
-    <!-- Profile screen strings -->
-    <string name="profile_avatar">Profile avatar</string>
-    <string name="profile_name">Người dùng</string>
-    <string name="profile_email">user@example.com</string>
-    <string name="profile_cover_desc">Profile cover</string>
-    <string name="profile_subtitle">Work hard in silence. Let your success be the noise.</string>
-    <string name="edit">Edit</string>
-    <string name="zero">0</string>
-    <string name="rides">Rides</string>
-    <string name="favorites">Favorites</string>
-    <string name="reviews">Reviews</string>
+    <!-- Login screen strings -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_to_account">Sign In To Account</string>
+    <string name="login_as">* Login As</string>
+    <string name="email_hint">john@example.com</string>
+    <string name="password_hint">Please enter your Password</string>
+    <string name="forgot_password">Forgot Your Password?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="or">or</string>
+    <string name="continue_with_google">Continue With Google</string>
+    <string name="continue_with_facebook">Continue With Facebook</string>
+    <string name="signup_text">Do not Have An Account? Sign Up Now</string>
 
-    <!-- Menu labels -->
-    <string name="my_address">My Address</string>
-    <string name="my_address_icon_desc">Address icon</string>
-    <string name="account">Account</string>
-    <string name="account_icon_desc">Account icon</string>
-    <string name="notifications">Notifications</string>
-    <string name="notifications_icon_desc">Notifications icon</string>
-    <string name="devices">Devices</string>
-    <string name="devices_icon_desc">Devices icon</string>
-    <string name="passwords">Passwords</string>
-    <string name="passwords_icon_desc">Passwords icon</string>
-    <string name="language">Language</string>
-    <string name="language_icon_desc">Language icon</string>
+    <!-- Register screen strings -->
+    <string name="create_account">Create Account</string>
+    <string name="sign_up_subtitle">Please fill in the form to continue</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="full_name_hint">Enter your full name</string>
+    <string name="phone_hint">Enter your phone number</string>
+    <string name="confirm_password_hint">Confirm your password</string>
+    <string name="terms_conditions">I agree to the Terms and Conditions</string>
+    <string name="signin_text">Already have an account? Sign In</string>
+    <string name="Back" />
 
-    <string name="my_bookings">My Bookings</string>
-    <string name="my_bookings_icon_desc">My bookings icon</string>
-    <string name="chevron_desc">Open</string>
-    <string name="payment_icon_desc">Payment icon</string>
-    <string name="payment_methods">Payment methods</string>
-    <string name="settings">Settings</string>
-    <string name="settings_icon_desc">Settings icon</string>
-    <string name="log_out">Log out</string>
+    <!-- Added strings -->
+    <string name="no_vehicles_found">No vehicles found</string>
+    <string name="search_hint">Search by name or location</string>
+    <string name="search_button">Search</string>
+    <string name="chip_all">All</string>
+    <string name="chip_suv">SUV</string>
+    <string name="chip_sedan">Sedan</string>
+    <string name="chip_economy">Economy</string>
 
-    <!-- New strings -->
-    <string name="title_edit_profile">Edit Profile</string>
+    <!-- For compact item layout -->
+    <string name="vehicle_image_desc">vehicle image</string>
+    <string name="sample_vehicle_name">Tesla Model 3</string>
+    <string name="sample_vehicle_details">2022 • Tesla • Sedan</string>
+    <string name="sample_price">$18</string>
+    <string name="view_label">View</string>
 </resources>
