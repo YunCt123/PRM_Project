@@ -1,22 +1,318 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true"
     tools:context=".ui.profile.ProfileFragment">
 
-    <TextView
-        android:id="@+id/text_profile"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Top cover area -->
+        <ImageView
+            android:id="@+id/ivCover"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/xe1"
+            android:contentDescription="@string/profile_cover_desc" />
+
+        <!-- Overlay for darker gradient (simple semi-transparent view) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="#80000000" />
+
+        <!-- Header content (avatar + name + subtitle) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="24dp">
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="92dp"
+                android:layout_height="92dp"
+                android:src="@drawable/user"
+                android:contentDescription="@string/profile_avatar"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_circle_light"
+                android:padding="6dp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp"
+                android:elevation="8dp" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_name"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_subtitle"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Main content card that overlaps the cover -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="-40dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Option item template -->
+                <LinearLayout
+                    android:id="@+id/llAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_location_24dp"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/my_address_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/my_address"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_100" />
+
+                <LinearLayout
+                    android:id="@+id/llAccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/user"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/account_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/account"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_100" />
+
+                <LinearLayout
+                    android:id="@+id/llNotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_search_24dp"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/notifications_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/notifications"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_100" />
+
+                <LinearLayout
+                    android:id="@+id/llDevices"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_location_24dp"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/devices_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/devices"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_100" />
+
+                <LinearLayout
+                    android:id="@+id/llPasswords"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/user"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/passwords_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/passwords"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/gray_100" />
+
+                <LinearLayout
+                    android:id="@+id/llLanguage"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_search_24dp"
+                        app:tint="@color/gray_700"
+                        android:contentDescription="@string/language_icon_desc" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/language"
+                        android:textSize="16sp"
+                        android:layout_marginStart="14dp"
+                        android:textColor="@color/gray_900" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_home_black_24dp"
+                        app:tint="@color/gray_400"
+                        android:contentDescription="@string/chevron_desc" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- spacer -->
+        <View android:layout_width="match_parent" android:layout_height="40dp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

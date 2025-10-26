@@ -3,4 +3,42 @@
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_profile">Profile</string>
+
+    <!-- Profile screen strings -->
+    <string name="profile_avatar">Profile avatar</string>
+    <string name="profile_name">Người dùng</string>
+    <string name="profile_email">user@example.com</string>
+    <string name="profile_cover_desc">Profile cover</string>
+    <string name="profile_subtitle">Work hard in silence. Let your success be the noise.</string>
+    <string name="edit">Edit</string>
+    <string name="zero">0</string>
+    <string name="rides">Rides</string>
+    <string name="favorites">Favorites</string>
+    <string name="reviews">Reviews</string>
+
+    <!-- Menu labels -->
+    <string name="my_address">My Address</string>
+    <string name="my_address_icon_desc">Address icon</string>
+    <string name="account">Account</string>
+    <string name="account_icon_desc">Account icon</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_icon_desc">Notifications icon</string>
+    <string name="devices">Devices</string>
+    <string name="devices_icon_desc">Devices icon</string>
+    <string name="passwords">Passwords</string>
+    <string name="passwords_icon_desc">Passwords icon</string>
+    <string name="language">Language</string>
+    <string name="language_icon_desc">Language icon</string>
+
+    <string name="my_bookings">My Bookings</string>
+    <string name="my_bookings_icon_desc">My bookings icon</string>
+    <string name="chevron_desc">Open</string>
+    <string name="payment_icon_desc">Payment icon</string>
+    <string name="payment_methods">Payment methods</string>
+    <string name="settings">Settings</string>
+    <string name="settings_icon_desc">Settings icon</string>
+    <string name="log_out">Log out</string>
+
+    <!-- New strings -->
+    <string name="title_edit_profile">Edit Profile</string>
 </resources>
