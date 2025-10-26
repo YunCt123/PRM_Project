@@ -82,3 +82,7 @@
     <string name="password_label">Password</string>
     <string name="toggle_password">Toggle password visibility</string>
 </resources>
+    <string name="terms_and_conditions_agreement"><![CDATA[I agree to the <a href="https://example.com/terms">terms and conditions</a> and <a href="https://example.com/privacy">privacy agreement</a>]]></string>
+    <string name="insurance_terms"><![CDATA[Insurance & Terms]]></string>
+    <string name="enter_your_full_name">Enter your full name</string>
+</resources>

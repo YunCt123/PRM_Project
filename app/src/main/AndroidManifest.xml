@@ -41,7 +41,13 @@
             android:name=".ui.details.DetailActivity"
             android:exported="false"
             android:parentActivityName=".activies.MainActivity" />
-            
+
+        <!-- Booking Activity -->
+        <activity
+            android:name=".ui.booking.BookingActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.details.DetailActivity" />
+
     </application>
 
 </manifest>
