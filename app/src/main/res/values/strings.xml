@@ -3,6 +3,31 @@
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_profile">Profile</string>
+    <string name="login">Login</string>
+
+    <!-- Login screen strings -->
+    <string name="welcome_back">Welcome Back</string>
+    <string name="sign_in_to_account">Sign In To Account</string>
+    <string name="login_as">* Login As</string>
+    <string name="email_hint">john@example.com</string>
+    <string name="password_hint">Please enter your Password</string>
+    <string name="forgot_password">Forgot Your Password?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="or">or</string>
+    <string name="continue_with_google">Continue With Google</string>
+    <string name="continue_with_facebook">Continue With Facebook</string>
+    <string name="signup_text">Do not Have An Account? Sign Up Now</string>
+
+    <!-- Register screen strings -->
+    <string name="create_account">Create Account</string>
+    <string name="sign_up_subtitle">Please fill in the form to continue</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="full_name_hint">Enter your full name</string>
+    <string name="phone_hint">Enter your phone number</string>
+    <string name="confirm_password_hint">Confirm your password</string>
+    <string name="terms_conditions">I agree to the Terms and Conditions</string>
+    <string name="signin_text">Already have an account? Sign In</string>
+    <string name="Back" />
 
     <!-- Added strings -->
     <string name="no_vehicles_found">No vehicles found</string>

@@ -1,6 +1,7 @@
 package com.example.prm_project.ui.home;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.prm_project.R;
+import com.example.prm_project.activies.LoginActivity;
 import com.example.prm_project.databinding.FragmentHomeBinding;
 
 import java.util.Calendar;
@@ -23,6 +26,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    private Button loginButton;
     private FragmentHomeBinding binding;
     private VehicleAdapter vehicleAdapter;
     private List<Vehicle> vehicleList;
@@ -39,6 +43,7 @@ public class HomeFragment extends Fragment {
         setupDatePickers();
         setupSearchButton();
         loadVehicleData();
+        login();
 
         return root;
     }
@@ -90,6 +95,22 @@ public class HomeFragment extends Fragment {
 
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
+    }
+
+    public void login() {
+        // Login logic here
+        // Initialize loginButton - find it from the root view since it's in an included layout
+        loginButton = binding.getRoot().findViewById(R.id.btn_Login);
+        if (loginButton != null) {
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle login button click
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private void searchVehicles(String location, String pickupDate, String returnDate) {
