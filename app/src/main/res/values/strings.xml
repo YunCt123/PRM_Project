@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EV Rental</string>
+    <string name="app_name">PRM_Project</string>
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_profile">Profile</string>
@@ -28,4 +28,20 @@
     <string name="terms_conditions">I agree to the Terms and Conditions</string>
     <string name="signin_text">Already have an account? Sign In</string>
     <string name="Back" />
+
+    <!-- Added strings -->
+    <string name="no_vehicles_found">No vehicles found</string>
+    <string name="search_hint">Search by name or location</string>
+    <string name="search_button">Search</string>
+    <string name="chip_all">All</string>
+    <string name="chip_suv">SUV</string>
+    <string name="chip_sedan">Sedan</string>
+    <string name="chip_economy">Economy</string>
+
+    <!-- For compact item layout -->
+    <string name="vehicle_image_desc">vehicle image</string>
+    <string name="sample_vehicle_name">Tesla Model 3</string>
+    <string name="sample_vehicle_details">2022 • Tesla • Sedan</string>
+    <string name="sample_price">$18</string>
+    <string name="view_label">View</string>
 </resources>
