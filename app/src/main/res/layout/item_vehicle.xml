@@ -133,8 +133,8 @@
             android:layout_height="wrap_content"
             android:text="Available"
             android:textSize="12sp"
-            android:textColor="@color/primary_green"
-            android:background="@color/light_green"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_status_available"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:layout_marginBottom="12dp" />
@@ -179,7 +179,9 @@
                 <Button
                     android:id="@+id/btn_view_details"
                     android:layout_width="100dp"
-                    android:layout_height="36dp"
+                    android:layout_height="48dp"
+                    android:minHeight="48dp"
+                    android:minWidth="48dp"
                     android:text="View Details"
                     android:textSize="12sp"
                     android:textColor="@color/white"
@@ -189,7 +191,8 @@
                 <Button
                     android:id="@+id/btn_book_now"
                     android:layout_width="100dp"
-                    android:layout_height="36dp"
+                    android:layout_height="48dp"
+                    android:minHeight="48dp"
                     android:text="Book Now"
                     android:textSize="12sp"
                     android:textColor="@color/white"

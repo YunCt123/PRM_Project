@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_menu_item_selector"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <ImageView
+        android:id="@+id/ivMenuIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:tint="@color/primary_blue"
+        android:src="@drawable/ic_home_black_24dp"
+        android:contentDescription="icon" />
+
+    <TextView
+        android:id="@+id/tvMenuTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Menu"
+        android:textSize="16sp"
+        android:textColor="@color/gray_900"
+        android:layout_marginStart="14dp" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:tint="@color/primary_blue"
+        android:src="@drawable/ic_chevron_right_24dp"
+        android:contentDescription="chevron" />
+</LinearLayout>

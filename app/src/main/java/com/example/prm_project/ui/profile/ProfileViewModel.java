@@ -12,26 +12,49 @@ public class ProfileViewModel extends ViewModel {
     private final MutableLiveData<Integer> ridesCount;
     private final MutableLiveData<Integer> favCount;
     private final MutableLiveData<Integer> reviewsCount;
+    private final MutableLiveData<String> distanceKm; // formatted
+    private final MutableLiveData<Integer> avatarResId; // drawable id
+    private final MutableLiveData<Integer> coverResId; // drawable id
+    private final MutableLiveData<String> birthDate;
+    private final MutableLiveData<String> phone;
 
     public ProfileViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is profile fragment");
 
-        // Sample/mock profile data
+        // Initialize LiveData containers
         name = new MutableLiveData<>();
-        name.setValue("Nguyễn Văn A");
-
         email = new MutableLiveData<>();
-        email.setValue("nguyenvana@example.com");
-
         ridesCount = new MutableLiveData<>();
-        ridesCount.setValue(12);
-
         favCount = new MutableLiveData<>();
-        favCount.setValue(3);
-
         reviewsCount = new MutableLiveData<>();
-        reviewsCount.setValue(5);
+        distanceKm = new MutableLiveData<>();
+        avatarResId = new MutableLiveData<>();
+        coverResId = new MutableLiveData<>();
+        birthDate = new MutableLiveData<>();
+        phone = new MutableLiveData<>();
+
+        // Load initial data
+        reloadFromRepository();
+    }
+
+    /**
+     * Reloads profile data from the (dummy) repository. Call this to force-refresh
+     * values so observers get updated (useful during development when replacing resources).
+     */
+    public void reloadFromRepository() {
+        Profile p = DummyProfileRepository.getDummyProfile();
+
+        name.setValue(p.getName());
+        email.setValue(p.getEmail());
+        ridesCount.setValue(p.getRidesCount());
+        favCount.setValue(p.getFavCount());
+        reviewsCount.setValue(p.getReviewsCount());
+        distanceKm.setValue(p.getDistanceKm());
+        avatarResId.setValue(p.getAvatarResId());
+        coverResId.setValue(p.getCoverResId());
+        birthDate.setValue(p.getBirthDate());
+        phone.setValue(p.getPhone());
     }
 
     public LiveData<String> getText() {
@@ -43,8 +66,19 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<Integer> getRidesCount() { return ridesCount; }
     public LiveData<Integer> getFavCount() { return favCount; }
     public LiveData<Integer> getReviewsCount() { return reviewsCount; }
+    public LiveData<String> getDistanceKm() { return distanceKm; }
+    public LiveData<Integer> getAvatarResId() { return avatarResId; }
+    public LiveData<Integer> getCoverResId() { return coverResId; }
+    public LiveData<String> getBirthDate() { return birthDate; }
+    public LiveData<String> getPhone() { return phone; }
 
     // Setters so other fragments can update profile info (kept in-memory for now)
     public void setName(String newName) { name.setValue(newName); }
     public void setEmail(String newEmail) { email.setValue(newEmail); }
+    public void setRidesCount(int v) { ridesCount.setValue(v); }
+    public void setDistanceKm(String d) { distanceKm.setValue(d); }
+    public void setAvatarResId(int resId) { avatarResId.setValue(resId); }
+    public void setCoverResId(int resId) { coverResId.setValue(resId); }
+    public void setBirthDate(String value) { birthDate.setValue(value); }
+    public void setPhone(String value) { phone.setValue(value); }
 }
