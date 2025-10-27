@@ -81,4 +81,13 @@
     <string name="btn_back">Back</string>
     <string name="password_label">Password</string>
     <string name="toggle_password">Toggle password visibility</string>
+
+    <!-- Profile labels and defaults (Vietnamese labels per design) -->
+    <string name="rides_label">Chuyến đi</string>
+    <string name="distance_label">Quãng đường</string>
+    <string name="zero_text">0</string>
+    <string name="zero_km">0 km</string>
+
+    <!-- Dev visual test string to confirm new layout is running -->
+    <string name="title_profile_dev">Profile (dev)</string>
 </resources>

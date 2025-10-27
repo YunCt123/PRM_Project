@@ -42,6 +42,11 @@
             android:exported="false"
             android:parentActivityName=".activies.MainActivity" />
             
+        <!-- Verify Account Activity -->
+        <activity
+            android:name=".VerifyAccountActivity"
+            android:exported="false"
+            android:label="Xác Minh Tài Khoản" />
     </application>
 
 </manifest>
