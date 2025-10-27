@@ -9,19 +9,18 @@
     <!-- Back Arrow -->
     <ImageView
         android:id="@+id/iv_back"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="18dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="@android:color/white"
+        android:padding="6dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
-        android:contentDescription="@string/Back"
         android:focusable="true"
-        android:padding="6dp"
-        android:src="@android:drawable/ic_menu_revert"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@android:color/white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Back Text -->
     <TextView

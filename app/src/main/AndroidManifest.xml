@@ -41,12 +41,13 @@
             android:name=".ui.details.DetailActivity"
             android:exported="false"
             android:parentActivityName=".activies.MainActivity" />
-            
-        <!-- Verify Account Activity -->
+
+        <!-- Booking Activity -->
         <activity
-            android:name=".VerifyAccountActivity"
+            android:name=".ui.booking.BookingActivity"
             android:exported="false"
-            android:label="Xác Minh Tài Khoản" />
+            android:parentActivityName=".ui.details.DetailActivity" />
+
     </application>
 
 </manifest>

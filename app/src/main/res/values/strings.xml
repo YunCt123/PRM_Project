@@ -91,3 +91,7 @@
     <!-- Dev visual test string to confirm new layout is running -->
     <string name="title_profile_dev">Profile (dev)</string>
 </resources>
+    <string name="terms_and_conditions_agreement"><![CDATA[I agree to the <a href="https://example.com/terms">terms and conditions</a> and <a href="https://example.com/privacy">privacy agreement</a>]]></string>
+    <string name="insurance_terms"><![CDATA[Insurance & Terms]]></string>
+    <string name="enter_your_full_name">Enter your full name</string>
+</resources>
