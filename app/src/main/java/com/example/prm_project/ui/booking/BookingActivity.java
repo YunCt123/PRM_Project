@@ -126,7 +126,7 @@ public class BookingActivity extends AppCompatActivity {
 
     private void setupTermsText() {
         // Set HTML text with clickable links
-        String termsText = getString(R.string.terms_and_conditions_agreement);
+        String termsText = getString(R.string.terms_conditions);
         tvTermsText.setText(HtmlCompat.fromHtml(termsText, HtmlCompat.FROM_HTML_MODE_LEGACY));
         tvTermsText.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -287,5 +287,12 @@ public class BookingActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void setupBackButton() {
+    TextView btnBack = findViewById(R.id.btn_booking_back);
+    btnBack.setOnClickListener(v -> {
+        finish(); // Close this activity and return to previous screen
+    });
     }
 }

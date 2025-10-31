@@ -10,36 +10,57 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header with Back Button -->
+        <!-- Header with Back Button Only -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:paddingStart="12dp"
+            android:layout_height="56dp"
+            android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:background="@color/white"
-            android:elevation="4dp">
+            android:elevation="2dp">
 
             <TextView
                 android:id="@+id/btn_booking_back"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="←"
-                android:textSize="22sp"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:gravity="center"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:gravity="center"
+                android:text="←"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Booking Details"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_900" />
+
+        </RelativeLayout>
+
+        <!-- Progress Steps Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp"
+            android:elevation="1dp">
 
             <!-- Progress Steps -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal"
                 android:gravity="center">
 
@@ -64,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" Vehicle Selection"
-                        android:textSize="12sp"
+                        android:textSize="9sp"
                         android:textColor="@color/gray_600"
                         android:layout_marginStart="4dp" />
 
@@ -97,7 +118,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" Booking Details"
-                        android:textSize="12sp"
+                        android:textSize="9sp"
                         android:textColor="@color/gray_900"
                         android:textStyle="bold"
                         android:layout_marginStart="4dp" />
@@ -131,7 +152,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" Payment"
-                        android:textSize="12sp"
+                        android:textSize="9sp"
+                        android:gravity="center"
                         android:textColor="@color/gray_500"
                         android:layout_marginStart="4dp" />
 
@@ -139,19 +161,7 @@
 
             </LinearLayout>
 
-        </RelativeLayout>
-
-        <!-- Main Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Booking Details"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/gray_900"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp" />
+        </LinearLayout>
 
         <!-- Rental Period Card -->
         <androidx.cardview.widget.CardView
@@ -503,13 +513,13 @@
                             android:id="@+id/et_full_name"
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
-                            android:hint="@string/enter_your_full_name"
-                            android:textSize="14sp"
+                            android:background="@drawable/bg_input_field"
+                            android:hint="@string/account"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
                             android:textColor="@color/gray_900"
                             android:textColorHint="@color/gray_500"
-                            android:background="@drawable/bg_input_field"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="16dp" />
+                            android:textSize="14sp" />
 
                     </LinearLayout>
 
