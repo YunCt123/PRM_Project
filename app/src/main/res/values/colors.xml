@@ -10,6 +10,7 @@
 
     <!-- EVRentals Theme Colors -->
     <color name="primary_blue">#2563EB</color>
+    <color name="primary_blue_10">#1A90CAF9</color>
     <color name="primary_green">#10B981</color>
     <color name="light_blue">#EFF6FF</color>
     <color name="light_green">#ECFDF5</color>
@@ -26,4 +27,5 @@
     <color name="yellow_400">#FBBF24</color>
     <color name="orange_500">#F97316</color>
     <color name="background_light">#F8FAFC</color>
+    <color name="red">#EF4444</color>
 </resources>

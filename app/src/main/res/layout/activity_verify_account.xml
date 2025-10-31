@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tvVerifyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xác Minh Tài Khoản"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary_blue"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:id="@+id/tvVerifyDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vui lòng cung cấp thông tin để xác minh tài khoản của bạn."
+        android:textSize="16sp"
+        android:textColor="@color/gray_700"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="32dp" />
+
+    <EditText
+        android:id="@+id/etFullName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Họ và tên"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etIdNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số CMND/CCCD"
+        android:inputType="number"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Số điện thoại"
+        android:inputType="phone"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnSubmitVerify"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Gửi xác minh"
+        android:textColor="@color/white"
+        android:background="@color/primary_blue"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
+
