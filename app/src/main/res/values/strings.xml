@@ -2,6 +2,7 @@
     <string name="app_name">PRM_Project</string>
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
+    <string name="title_booking">Booking</string>
     <string name="title_profile">Profile</string>
     <string name="login">Login</string>
 
@@ -93,4 +94,34 @@
     <string name="terms_and_conditions_agreement"><![CDATA[I agree to the <a href="https://example.com/terms">terms and conditions</a> and <a href="https://example.com/privacy">privacy agreement</a>]]></string>
     <string name="insurance_terms"><![CDATA[Insurance & Terms]]></string>
     <string name="enter_your_full_name">Enter your full name</string>
+
+    <!-- Booking screen strings -->
+    <string name="my_bookings">Đặt xe của tôi</string>
+    <string name="booking_history">Lịch sử đặt xe</string>
+    <string name="active_bookings">Đang hoạt động</string>
+    <string name="completed_bookings">Đã hoàn thành</string>
+    <string name="cancelled_bookings">Đã hủy</string>
+    <string name="no_bookings">Chưa có đơn đặt xe nào</string>
+    <string name="no_bookings_message">Bạn chưa có đơn đặt xe nào. Hãy bắt đầu tìm kiếm và đặt xe ngay!</string>
+
+    <!-- Payment screen strings -->
+    <string name="payment_methods">Phương thức thanh toán</string>
+    <string name="select_payment_method">Chọn phương thức thanh toán</string>
+    <string name="payos">PayOS</string>
+    <string name="payos_description">Thanh toán nhanh chóng và an toàn</string>
+    <string name="cash_payment">Tiền mặt</string>
+    <string name="cash_description">Thanh toán khi nhận xe</string>
+    <string name="order_summary">Tóm tắt đơn hàng</string>
+    <string name="vehicle_rental">Xe thuê</string>
+    <string name="rental_duration">Thời gian thuê</string>
+    <string name="rental_fee">Giá thuê</string>
+    <string name="service_fee">Phí dịch vụ</string>
+    <string name="insurance">Bảo hiểm</string>
+    <string name="total">Tổng cộng</string>
+    <string name="proceed_payment">THANH TOÁN NGAY</string>
+    <string name="payment_security">Giao dịch được mã hóa và bảo mật</string>
+    <string name="qr_code">QR Code</string>
+    <string name="atm_card">ATM Card</string>
+    <string name="e_wallet">Ví điện tử</string>
 </resources>
+
