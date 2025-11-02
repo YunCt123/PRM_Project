@@ -74,8 +74,15 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         });
 
         holder.btnBookNow.setOnClickListener(v -> {
-            Toast.makeText(context, "Booking " + vehicle.getName() + "...", Toast.LENGTH_SHORT).show();
-            // TODO: Navigate to booking scr1een
+            // Navigate to PaymentActivity
+            Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
+            
+            // Pass vehicle data
+            intent.putExtra("vehicle_name", vehicle.getName());
+            intent.putExtra("vehicle_price", vehicle.getPrice());
+            intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
+            
+            context.startActivity(intent);
         });
 
         // Set click listener for entire card

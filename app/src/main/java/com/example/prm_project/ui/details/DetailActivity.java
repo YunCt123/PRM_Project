@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_project.R;
-import com.example.prm_project.ui.booking.BookingActivity;
+import com.example.prm_project.activies.PaymentActivity;
 import com.example.prm_project.ui.home.Vehicle;
 
 public class DetailActivity extends AppCompatActivity {
@@ -80,12 +80,21 @@ public class DetailActivity extends AppCompatActivity {
 
         // Set click listeners
         btnBookNow.setOnClickListener(v -> {
-            // Navigate to BookingActivity
-            Intent bookingIntent = new Intent(DetailActivity.this, BookingActivity.class);
-            bookingIntent.putExtra("vehicle_name", vehicle.getName());
-            bookingIntent.putExtra("vehicle_price", vehicle.getPrice());
-            bookingIntent.putExtra("vehicle_image", vehicleImageRes);
-            startActivity(bookingIntent);
+            // Navigate to PaymentActivity
+            Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
+            paymentIntent.putExtra("vehicle_name", vehicle.getName());
+            
+            // Extract price number from string like "$80" or "$80/day"
+            String priceStr = vehicle.getPrice().replace("$", "").split("/")[0].trim();
+            try {
+                double price = Double.parseDouble(priceStr);
+                paymentIntent.putExtra("daily_rate", price);
+            } catch (NumberFormatException e) {
+                paymentIntent.putExtra("daily_rate", 80.0); // Default value
+            }
+            
+            paymentIntent.putExtra("rental_period", "1 ngày"); // Default 1 day
+            startActivity(paymentIntent);
         });
 
         btnBack.setOnClickListener(v -> {
