@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.LoginActivity;
 import com.example.prm_project.databinding.FragmentHomeBinding;
+import com.example.prm_project.repository.VehicleRepository;
+import com.example.prm_project.utils.VehicleConverter;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private VehicleAdapter vehicleAdapter;
     private List<Vehicle> vehicleList;
+    private VehicleRepository vehicleRepository;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,10 +42,13 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // Initialize repository
+        vehicleRepository = new VehicleRepository();
+
         setupRecyclerView();
         setupDatePickers();
         setupSearchButton();
-        loadVehicleData();
+        loadVehicleDataFromApi();
         login();
 
         return root;
@@ -71,7 +77,7 @@ public class HomeFragment extends Fragment {
             String returnDate = binding.etReturnDate.getText().toString();
 
             if (location.isEmpty() || pickupDate.isEmpty() || returnDate.isEmpty()) {
-                Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             } else {
                 searchVehicles(location, pickupDate, returnDate);
             }
@@ -116,88 +122,54 @@ public class HomeFragment extends Fragment {
     private void searchVehicles(String location, String pickupDate, String returnDate) {
         // Filter vehicles based on search criteria
         Toast.makeText(getContext(),
-            "Searching vehicles for " + location + " from " + pickupDate + " to " + returnDate,
+            "Đang tìm xe tại " + location + " từ " + pickupDate + " đến " + returnDate,
             Toast.LENGTH_SHORT).show();
 
-        // You can implement actual filtering logic here
-        loadVehicleData();
+        // TODO: Implement actual filtering logic with API
+        // For now, just reload from API
+        loadVehicleDataFromApi();
     }
 
-    private void loadVehicleData() {
-        vehicleList.clear();
+    private void loadVehicleDataFromApi() {
+        // Show loading state
+        if (binding.rvVehicles != null) {
+            binding.rvVehicles.setVisibility(View.VISIBLE);
+        }
 
-        // Sample data with vehicle images cycling through xe1, xe2, xe3
-        vehicleList.add(new Vehicle(
-            "BMW iX3",
-            "2023 • BMW • SUV",
-            "92%",
-            "460 km range",
-            "5 Seats",
-            "District 3 Station",
-            "$25",
-            "/hour • $200/day",
-            "Available",
-            "4.7",
-            "Excellent"
-        ));
+        // Load available vehicles from API
+        vehicleRepository.getAvailableVehicles(20, new VehicleRepository.VehicleCallback() {
+            @Override
+            public void onSuccess(List<com.example.prm_project.models.Vehicle> apiVehicles) {
+                // Convert API vehicles to UI vehicles
+                vehicleList.clear();
+                for (com.example.prm_project.models.Vehicle apiVehicle : apiVehicles) {
+                    Vehicle uiVehicle = VehicleConverter.toUIVehicle(apiVehicle);
+                    if (uiVehicle != null) {
+                        vehicleList.add(uiVehicle);
+                    }
+                }
+                
+                // Update UI on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        vehicleAdapter.notifyDataSetChanged();
+                        if (vehicleList.isEmpty()) {
+                            Toast.makeText(getContext(), "Không có xe nào khả dụng", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
 
-        vehicleList.add(new Vehicle(
-            "Tesla Model 3",
-            "2022 • Tesla • Sedan",
-            "85%",
-            "358 km range",
-            "5 Seats",
-            "District 7 Station",
-            "$18",
-            "/hour • $150/day",
-            "Available",
-            "4.9",
-            "Good"
-        ));
-
-        vehicleList.add(new Vehicle(
-            "Audi e-tron GT",
-            "2024 • Audi • Sports Car",
-            "78%",
-            "380 km range",
-            "4 Seats",
-            "District 1 Station",
-            "$35",
-            "/hour • $280/day",
-            "Available",
-            "4.8",
-            "Excellent"
-        ));
-
-        vehicleList.add(new Vehicle(
-            "VinFast VF8",
-            "2023 • VinFast • SUV",
-            "90%",
-            "420 km range",
-            "5 Seats",
-            "District 1 Station",
-            "$15",
-            "/hour • $120/day",
-            "Available",
-            "4.8",
-            "Excellent"
-        ));
-
-        vehicleList.add(new Vehicle(
-            "Hyundai Kona Electric",
-            "2023 • Hyundai • Crossover",
-            "78%",
-            "305 km range",
-            "5 Seats",
-            "Binh Thanh Station",
-            "$12",
-            "/hour • $90/day",
-            "Available",
-            "4.5",
-            "Good"
-        ));
-
-        vehicleAdapter.notifyDataSetChanged();
+            @Override
+            public void onError(String errorMessage) {
+                // Show error on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Lỗi kết nối API: " + errorMessage, Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+        });
     }
 
     @Override

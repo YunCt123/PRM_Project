@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Vehicle Details"
+                android:text="@string/vehicle_details"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/gray_900" />
@@ -70,28 +70,28 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Vehicle Name and Rating -->
-                <RelativeLayout
+                <!-- Vehicle Name and Rating - Fix overlap issue -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginBottom="16dp">
 
                     <TextView
                         android:id="@+id/tv_vehicle_detail_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Tesla Model 3"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="@color/gray_900" />
+                        android:textColor="@color/gray_900"
+                        android:layout_marginBottom="8dp" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
                         android:orientation="horizontal"
-                        android:gravity="center">
+                        android:gravity="center_vertical">
 
                         <TextView
                             android:id="@+id/tv_vehicle_detail_rating"
@@ -111,14 +111,14 @@
 
                     </LinearLayout>
 
-                </RelativeLayout>
+                </LinearLayout>
 
-                <!-- Vehicle Details -->
+                <!-- Vehicle Details - Year • Color -->
                 <TextView
                     android:id="@+id/tv_vehicle_detail_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2024 • Tesla • Sedan"
+                    android:text="2024 • Xanh"
                     android:textSize="16sp"
                     android:textColor="@color/gray_600"
                     android:layout_marginBottom="20dp" />
@@ -160,7 +160,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Battery"
+                            android:text="@string/battery"
                             android:textSize="12sp"
                             android:textColor="@color/gray_600" />
 
@@ -196,7 +196,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Range"
+                            android:text="@string/range"
                             android:textSize="12sp"
                             android:textColor="@color/gray_600" />
 

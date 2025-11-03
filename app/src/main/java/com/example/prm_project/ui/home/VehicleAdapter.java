@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 
 import java.util.List;
@@ -46,10 +47,20 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.tvPriceDetails.setText(vehicle.getPriceDetails());
         holder.tvStatus.setText(vehicle.getStatus());
 
-        // Set vehicle image based on position (DEFINE FIRST)
-        int[] vehicleImages = {R.drawable.xe1, R.drawable.xe2, R.drawable.xe3};
-        int imageIndex = position % vehicleImages.length;
-        holder.ivVehicleImage.setImageResource(vehicleImages[imageIndex]);
+        // Load image from URL using Glide
+        if (vehicle.getImageUrl() != null && !vehicle.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(vehicle.getImageUrl())
+                    .placeholder(R.drawable.xe1)  // Placeholder khi đang load
+                    .error(R.drawable.xe1)        // Ảnh mặc định nếu load lỗi
+                    .centerCrop()
+                    .into(holder.ivVehicleImage);
+        } else {
+            // Fallback nếu không có URL
+            int[] vehicleImages = {R.drawable.xe1, R.drawable.xe2, R.drawable.xe3};
+            int imageIndex = position % vehicleImages.length;
+            holder.ivVehicleImage.setImageResource(vehicleImages[imageIndex]);
+        }
 
         // Set click listeners for buttons
         holder.btnViewDetails.setOnClickListener(v -> {
@@ -68,7 +79,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_status", vehicle.getStatus());
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
-            intent.putExtra("vehicle_image", vehicleImages[imageIndex]);
+            intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
             
             context.startActivity(intent);
         });
@@ -101,7 +112,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_status", vehicle.getStatus());
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
-            intent.putExtra("vehicle_image", vehicleImages[imageIndex]);
+            intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
             
             context.startActivity(intent);
         });
