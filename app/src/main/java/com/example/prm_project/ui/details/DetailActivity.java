@@ -9,14 +9,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.PaymentActivity;
 import com.example.prm_project.ui.home.Vehicle;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class DetailActivity extends AppCompatActivity {
 
     private Vehicle vehicle;
-    private int vehicleImageRes;
+    private String vehicleImageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +49,13 @@ public class DetailActivity extends AppCompatActivity {
                 intent.getStringExtra("vehicle_condition")
             );
             
-            vehicleImageRes = intent.getIntExtra("vehicle_image", R.drawable.xe1);
+            vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
 
-            setupViews(vehicleImageRes);
+            setupViews();
         }
     }
 
-    private void setupViews(int vehicleImageRes) {
+    private void setupViews() {
         // Find views
         ImageView ivVehicleImage = findViewById(R.id.iv_vehicle_detail_image);
         TextView tvVehicleName = findViewById(R.id.tv_vehicle_detail_name);
@@ -67,15 +71,36 @@ public class DetailActivity extends AppCompatActivity {
         TextView btnBack = findViewById(R.id.btn_detail_back);
 
         // Set data
-        ivVehicleImage.setImageResource(vehicleImageRes);
+        // Load image from URL using Glide
+        if (vehicleImageUrl != null && !vehicleImageUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(vehicleImageUrl)
+                    .placeholder(R.drawable.xe1)
+                    .error(R.drawable.xe1)
+                    .centerCrop()
+                    .into(ivVehicleImage);
+        } else {
+            ivVehicleImage.setImageResource(R.drawable.xe1);
+        }
+        
         tvVehicleName.setText(vehicle.getName());
+        
+        // Display vehicle details (year • color format)
         tvVehicleDetails.setText(vehicle.getDetails());
+        
+        // Display battery and range
         tvBatteryPercent.setText(vehicle.getBatteryPercent());
         tvRange.setText(vehicle.getRange());
+        
+        // Display seats and location
         tvSeats.setText(vehicle.getSeats());
         tvLocation.setText(vehicle.getLocation());
+        
+        // Display rating
         tvRating.setText(vehicle.getRating());
-        tvPrice.setText(vehicle.getPrice());
+        
+        // Format and display price
+        tvPrice.setText(formatPrice(vehicle.getPrice()));
         tvPriceDetails.setText(vehicle.getPriceDetails());
 
         // Set click listeners
@@ -100,5 +125,34 @@ public class DetailActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> {
             finish(); // Close this activity and return to previous screen
         });
+    }
+    
+    /**
+     * Format price to Vietnamese format
+     */
+    private String formatPrice(String price) {
+        if (price == null || price.isEmpty()) {
+            return "0 ₫";
+        }
+        
+        // If already formatted, return as is
+        if (price.contains("₫") || price.contains("đ")) {
+            return price;
+        }
+        
+        // Try to parse and format
+        try {
+            // Remove currency symbols and extract number
+            String numStr = price.replaceAll("[^0-9.]", "").trim();
+            if (!numStr.isEmpty()) {
+                double amount = Double.parseDouble(numStr);
+                NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                return formatter.format(amount) + " ₫";
+            }
+        } catch (Exception e) {
+            // If parsing fails, return original
+        }
+        
+        return price;
     }
 }
