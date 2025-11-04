@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 import com.example.prm_project.ui.details.DetailActivity;
 import com.example.prm_project.ui.home.Vehicle;
@@ -61,10 +62,21 @@ public class SearchVehicleAdapter extends RecyclerView.Adapter<SearchVehicleAdap
                 holder.tvPrice.setText(v.getPrice());
             }
 
-            int[] vehicleImages = {R.drawable.xe1, R.drawable.xe2, R.drawable.xe3};
-            int imageIndex = Math.abs(position % vehicleImages.length);
+            // Load image from URL using Glide
             if (holder.ivVehicleImage != null) {
-                holder.ivVehicleImage.setImageResource(vehicleImages[imageIndex]);
+                if (v.getImageUrl() != null && !v.getImageUrl().isEmpty()) {
+                    Glide.with(holder.ivVehicleImage.getContext())
+                            .load(v.getImageUrl())
+                            .placeholder(R.drawable.xe1)
+                            .error(R.drawable.xe1)
+                            .centerCrop()
+                            .into(holder.ivVehicleImage);
+                } else {
+                    // Fallback nếu không có URL
+                    int[] vehicleImages = {R.drawable.xe1, R.drawable.xe2, R.drawable.xe3};
+                    int imageIndex = Math.abs(position % vehicleImages.length);
+                    holder.ivVehicleImage.setImageResource(vehicleImages[imageIndex]);
+                }
             }
 
             if (holder.btnView != null) {
@@ -82,7 +94,7 @@ public class SearchVehicleAdapter extends RecyclerView.Adapter<SearchVehicleAdap
                         intent.putExtra("vehicle_status", v.getStatus());
                         intent.putExtra("vehicle_rating", v.getRating());
                         intent.putExtra("vehicle_condition", v.getCondition());
-                        intent.putExtra("vehicle_image", vehicleImages[imageIndex]);
+                        intent.putExtra("vehicle_image_url", v.getImageUrl());  // Pass URL thay vì resource ID
                         view.getContext().startActivity(intent);
                     } catch (Exception e) {
                         Log.e(TAG, "Error launching detail activity", e);

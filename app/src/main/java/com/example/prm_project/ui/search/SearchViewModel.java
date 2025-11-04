@@ -1,31 +1,33 @@
 package com.example.prm_project.ui.search;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.prm_project.repository.VehicleRepository;
 import com.example.prm_project.ui.home.Vehicle;
+import com.example.prm_project.utils.VehicleConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchViewModel extends ViewModel {
 
+    private static final String TAG = "SearchViewModel";
+    
     private final MutableLiveData<String> mText = new MutableLiveData<>();
     private final MutableLiveData<List<Vehicle>> filteredVehicles = new MutableLiveData<>();
     private final List<Vehicle> allVehicles = new ArrayList<>();
+    private final VehicleRepository vehicleRepository;
 
     public SearchViewModel() {
         mText.setValue("This is search fragment");
-
-        // Sample data
-        allVehicles.add(new Vehicle("BMW iX3", "2023 • BMW • SUV", "92%", "460 km range", "5 Seats", "District 3 Station", "$25", "/hour • $200/day", "Available", "4.7", "Excellent"));
-        allVehicles.add(new Vehicle("Tesla Model 3", "2022 • Tesla • Sedan", "85%", "358 km range", "5 Seats", "District 7 Station", "$18", "/hour • $150/day", "Available", "4.9", "Good"));
-        allVehicles.add(new Vehicle("Audi e-tron GT", "2024 • Audi • Sports Car", "78%", "380 km range", "4 Seats", "District 1 Station", "$35", "/hour • $280/day", "Available", "4.8", "Excellent"));
-        allVehicles.add(new Vehicle("VinFast VF8", "2023 • VinFast • SUV", "90%", "420 km range", "5 Seats", "District 1 Station", "$15", "/hour • $120/day", "Available", "4.8", "Excellent"));
-        allVehicles.add(new Vehicle("Hyundai Kona Electric", "2023 • Hyundai • Crossover", "78%", "305 km range", "5 Seats", "Binh Thanh Station", "$12", "/hour • $90/day", "Available", "4.5", "Good"));
-
-        filteredVehicles.setValue(new ArrayList<>(allVehicles));
+        vehicleRepository = new VehicleRepository();
+        
+        // Load all vehicles from API
+        loadAllVehiclesFromApi();
     }
 
     public LiveData<String> getText() {
@@ -36,14 +38,42 @@ public class SearchViewModel extends ViewModel {
         return filteredVehicles;
     }
 
+    private void loadAllVehiclesFromApi() {
+        // Load all vehicles from API
+        vehicleRepository.getAllVehicles(new VehicleRepository.VehicleCallback() {
+            @Override
+            public void onSuccess(List<com.example.prm_project.models.Vehicle> apiVehicles) {
+                allVehicles.clear();
+                for (com.example.prm_project.models.Vehicle apiVehicle : apiVehicles) {
+                    Vehicle uiVehicle = VehicleConverter.toUIVehicle(apiVehicle);
+                    if (uiVehicle != null) {
+                        allVehicles.add(uiVehicle);
+                    }
+                }
+                filteredVehicles.postValue(new ArrayList<>(allVehicles));
+                Log.d(TAG, "Loaded " + allVehicles.size() + " vehicles from API");
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e(TAG, "Error loading vehicles from API: " + errorMessage);
+                // Không có fallback data - chỉ hiển thị lỗi
+                filteredVehicles.postValue(new ArrayList<>());
+            }
+        });
+    }
+
     public void search(String location, String pickupDate, String returnDate) {
         if (location == null) location = "";
         String q = location.trim().toLowerCase();
+        
         if (q.isEmpty()) {
+            // If empty, show all vehicles
             filteredVehicles.setValue(new ArrayList<>(allVehicles));
             return;
         }
 
+        // Search locally in loaded vehicles
         List<Vehicle> result = new ArrayList<>();
         for (Vehicle v : allVehicles) {
             if (v.getLocation() != null && v.getLocation().toLowerCase().contains(q)) {
@@ -56,5 +86,44 @@ public class SearchViewModel extends ViewModel {
         }
 
         filteredVehicles.setValue(result);
+    }
+
+    /**
+     * Filter vehicles by brand từ API data
+     * @param brand Brand name để filter (ví dụ: "Xiaomi", "VinFast", etc.)
+     */
+    public void searchByBrand(String brand) {
+        if (brand == null || brand.trim().isEmpty()) {
+            filteredVehicles.setValue(new ArrayList<>(allVehicles));
+            return;
+        }
+
+        String brandLower = brand.trim().toLowerCase();
+        List<Vehicle> result = new ArrayList<>();
+        for (Vehicle v : allVehicles) {
+            // Filter theo brand field từ API thay vì name
+            if (v.getBrand() != null && v.getBrand().toLowerCase().contains(brandLower)) {
+                result.add(v);
+            }
+        }
+        filteredVehicles.setValue(result);
+        Log.d(TAG, "Filtered by brand '" + brand + "': " + result.size() + " vehicles");
+    }
+    
+    /**
+     * Get danh sách các brand unique từ data
+     */
+    public List<String> getAvailableBrands() {
+        List<String> brands = new ArrayList<>();
+        for (Vehicle v : allVehicles) {
+            if (v.getBrand() != null && !v.getBrand().isEmpty() && !brands.contains(v.getBrand())) {
+                brands.add(v.getBrand());
+            }
+        }
+        return brands;
+    }
+
+    public void reload() {
+        loadAllVehiclesFromApi();
     }
 }

@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Internet permission for API calls -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -42,11 +46,19 @@
             android:exported="false"
             android:parentActivityName=".activies.MainActivity" />
 
-        <!-- Booking Activity -->
+        <!-- Booking Details Activity -->
         <activity
-            android:name=".ui.booking.BookingActivity"
+            android:name=".ui.booking.BookingDetailsActivity"
             android:exported="false"
-            android:parentActivityName=".ui.details.DetailActivity" />
+            android:label="Chi tiết đặt xe"
+            android:parentActivityName=".activies.MainActivity" />
+
+        <!-- Payment Activity -->
+        <activity
+            android:name=".activies.PaymentActivity"
+            android:exported="false"
+            android:label="Thanh toán"
+            android:parentActivityName=".activies.MainActivity" />
 
     </application>
 

@@ -19,6 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.LoginActivity;
 import com.example.prm_project.databinding.FragmentHomeBinding;
+import com.example.prm_project.repository.VehicleRepository;
+import com.example.prm_project.utils.SessionManager;
+import com.example.prm_project.utils.VehicleConverter;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -30,6 +34,8 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private VehicleAdapter vehicleAdapter;
     private List<Vehicle> vehicleList;
+    private VehicleRepository vehicleRepository;
+    private SessionManager sessionManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -39,11 +45,15 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // Initialize repository and session manager
+        vehicleRepository = new VehicleRepository();
+        sessionManager = new SessionManager(requireContext());
+
         setupRecyclerView();
         setupDatePickers();
         setupSearchButton();
-        loadVehicleData();
-        login();
+        loadVehicleDataFromApi();
+        setupLoginLogoutButton();
 
         return root;
     }
@@ -71,7 +81,7 @@ public class HomeFragment extends Fragment {
             String returnDate = binding.etReturnDate.getText().toString();
 
             if (location.isEmpty() || pickupDate.isEmpty() || returnDate.isEmpty()) {
-                Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             } else {
                 searchVehicles(location, pickupDate, returnDate);
             }
@@ -97,107 +107,113 @@ public class HomeFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    public void login() {
-        // Login logic here
+    private void setupLoginLogoutButton() {
         // Initialize loginButton - find it from the root view since it's in an included layout
         loginButton = binding.getRoot().findViewById(R.id.btn_Login);
         if (loginButton != null) {
-            loginButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Handle login button click
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(intent);
-                }
+            updateLoginLogoutButton();
+        }
+    }
+
+    private void updateLoginLogoutButton() {
+        if (loginButton == null) return;
+
+        // Check if user is logged in
+        if (sessionManager.isLoggedIn()) {
+            // User is logged in - show Logout button
+            loginButton.setText("Logout");
+            loginButton.setOnClickListener(v -> showLogoutDialog());
+        } else {
+            // User is not logged in - show Get Started button
+            loginButton.setText("Get Started");
+            loginButton.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(intent);
             });
         }
+    }
+
+    private void showLogoutDialog() {
+        new MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Đăng xuất")
+            .setMessage("Bạn có chắc chắn muốn đăng xuất?")
+            .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                // Logout user
+                sessionManager.logout();
+                
+                // Show success message
+                Toast.makeText(getContext(), "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
+                
+                // Update button
+                updateLoginLogoutButton();
+                
+                // Navigate to login screen
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
     }
 
     private void searchVehicles(String location, String pickupDate, String returnDate) {
         // Filter vehicles based on search criteria
         Toast.makeText(getContext(),
-            "Searching vehicles for " + location + " from " + pickupDate + " to " + returnDate,
+            "Đang tìm xe tại " + location + " từ " + pickupDate + " đến " + returnDate,
             Toast.LENGTH_SHORT).show();
 
-        // You can implement actual filtering logic here
-        loadVehicleData();
+        // TODO: Implement actual filtering logic with API
+        // For now, just reload from API
+        loadVehicleDataFromApi();
     }
 
-    private void loadVehicleData() {
-        vehicleList.clear();
+    private void loadVehicleDataFromApi() {
+        // Show loading state
+        if (binding.rvVehicles != null) {
+            binding.rvVehicles.setVisibility(View.VISIBLE);
+        }
 
-        // Sample data with vehicle images cycling through xe1, xe2, xe3
-        vehicleList.add(new Vehicle(
-            "BMW iX3",
-            "2023 • BMW • SUV",
-            "92%",
-            "460 km range",
-            "5 Seats",
-            "District 3 Station",
-            "$25",
-            "/hour • $200/day",
-            "Available",
-            "4.7",
-            "Excellent"
-        ));
+        // Load available vehicles from API
+        vehicleRepository.getAvailableVehicles(20, new VehicleRepository.VehicleCallback() {
+            @Override
+            public void onSuccess(List<com.example.prm_project.models.Vehicle> apiVehicles) {
+                // Convert API vehicles to UI vehicles
+                vehicleList.clear();
+                for (com.example.prm_project.models.Vehicle apiVehicle : apiVehicles) {
+                    Vehicle uiVehicle = VehicleConverter.toUIVehicle(apiVehicle);
+                    if (uiVehicle != null) {
+                        vehicleList.add(uiVehicle);
+                    }
+                }
+                
+                // Update UI on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        vehicleAdapter.notifyDataSetChanged();
+                        if (vehicleList.isEmpty()) {
+                            Toast.makeText(getContext(), "Không có xe nào khả dụng", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
 
-        vehicleList.add(new Vehicle(
-            "Tesla Model 3",
-            "2022 • Tesla • Sedan",
-            "85%",
-            "358 km range",
-            "5 Seats",
-            "District 7 Station",
-            "$18",
-            "/hour • $150/day",
-            "Available",
-            "4.9",
-            "Good"
-        ));
+            @Override
+            public void onError(String errorMessage) {
+                // Show error on main thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Lỗi kết nối API: " + errorMessage, Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+        });
+    }
 
-        vehicleList.add(new Vehicle(
-            "Audi e-tron GT",
-            "2024 • Audi • Sports Car",
-            "78%",
-            "380 km range",
-            "4 Seats",
-            "District 1 Station",
-            "$35",
-            "/hour • $280/day",
-            "Available",
-            "4.8",
-            "Excellent"
-        ));
-
-        vehicleList.add(new Vehicle(
-            "VinFast VF8",
-            "2023 • VinFast • SUV",
-            "90%",
-            "420 km range",
-            "5 Seats",
-            "District 1 Station",
-            "$15",
-            "/hour • $120/day",
-            "Available",
-            "4.8",
-            "Excellent"
-        ));
-
-        vehicleList.add(new Vehicle(
-            "Hyundai Kona Electric",
-            "2023 • Hyundai • Crossover",
-            "78%",
-            "305 km range",
-            "5 Seats",
-            "Binh Thanh Station",
-            "$12",
-            "/hour • $90/day",
-            "Available",
-            "4.5",
-            "Good"
-        ));
-
-        vehicleAdapter.notifyDataSetChanged();
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Update button state when fragment resumes (e.g., after login)
+        updateLoginLogoutButton();
     }
 
     @Override

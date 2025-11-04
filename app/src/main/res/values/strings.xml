@@ -1,86 +1,89 @@
 <resources>
-    <string name="app_name">PRM_Project</string>
+    <string name="app_name">Thuê Xe Điện</string>
+    <!-- Bottom tabs giữ nguyên tiếng Anh -->
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
+    <string name="title_booking">Booking</string>
     <string name="title_profile">Profile</string>
-    <string name="login">Login</string>
+
+    <string name="login">Đăng nhập</string>
 
     <!-- Login screen strings -->
-    <string name="welcome_back">Welcome Back</string>
-    <string name="sign_in_to_account">Sign In To Account</string>
-    <string name="login_as">* Login As</string>
-    <string name="email_hint">john@example.com</string>
-    <string name="password_hint">Please enter your Password</string>
-    <string name="forgot_password">Forgot Your Password?</string>
-    <string name="sign_in">Sign in</string>
-    <string name="or">or</string>
-    <string name="continue_with_google">Continue With Google</string>
-    <string name="continue_with_facebook">Continue With Facebook</string>
-    <string name="signup_text">Do not Have An Account? Sign Up Now</string>
+    <string name="welcome_back">Chào mừng trở lại</string>
+    <string name="sign_in_to_account">Đăng nhập vào tài khoản</string>
+    <string name="login_as">* Đăng nhập với vai trò</string>
+    <string name="email_hint">email@example.com</string>
+    <string name="password_hint">Nhập mật khẩu của bạn</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="sign_in">Đăng nhập</string>
+    <string name="or">hoặc</string>
+    <string name="continue_with_google">Tiếp tục với Google</string>
+    <string name="continue_with_facebook">Tiếp tục với Facebook</string>
+    <string name="signup_text">Chưa có tài khoản? Đăng ký ngay</string>
 
     <!-- Register screen strings -->
-    <string name="create_account">Create Account</string>
-    <string name="sign_up_subtitle">Please fill in the form to continue</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="full_name_hint">Enter your full name</string>
-    <string name="phone_hint">Enter your phone number</string>
-    <string name="confirm_password_hint">Confirm your password</string>
-    <string name="terms_conditions">I agree to the Terms and Conditions</string>
-    <string name="signin_text">Already have an account? Sign In</string>
+    <string name="create_account">Tạo tài khoản</string>
+    <string name="sign_up_subtitle">Vui lòng điền thông tin để tiếp tục</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="full_name_hint">Nhập họ và tên</string>
+    <string name="phone_hint">Nhập số điện thoại</string>
+    <string name="confirm_password_hint">Xác nhận mật khẩu</string>
+    <string name="terms_conditions">Tôi đồng ý với Điều khoản và Điều kiện</string>
+    <string name="signin_text">Đã có tài khoản? Đăng nhập</string>
     <string name="Back" />
 
     <!-- Added strings -->
-    <string name="no_vehicles_found">No vehicles found</string>
-    <string name="search_hint">Search by name or location</string>
-    <string name="search_button">Search</string>
-    <string name="chip_all">All</string>
+    <string name="no_vehicles_found">Không tìm thấy phương tiện</string>
+    <string name="search_hint">Tìm theo tên hoặc địa điểm</string>
+    <string name="search_button">Tìm kiếm</string>
+    <string name="chip_all">Tất cả</string>
     <string name="chip_suv">SUV</string>
     <string name="chip_sedan">Sedan</string>
-    <string name="chip_economy">Economy</string>
+    <string name="chip_economy">Tiết kiệm</string>
 
     <!-- For compact item layout -->
-    <string name="vehicle_image_desc">vehicle image</string>
+    <string name="vehicle_image_desc">Hình ảnh xe</string>
     <string name="sample_vehicle_name">Tesla Model 3</string>
     <string name="sample_vehicle_details">2022 • Tesla • Sedan</string>
     <string name="sample_price">$18</string>
-    <string name="view_label">View</string>
+    <string name="view_label">Xem</string>
 
     <!-- Profile & Edit Profile strings -->
-    <string name="chevron_desc">Chevron icon</string>
-    <string name="title_edit_profile">Edit Profile</string>
-    <string name="edit">Edit</string>
-    <string name="profile_avatar">Profile Avatar</string>
-    <string name="passwords_icon_desc">Passwords Icon</string>
-    <string name="profile_cover_desc">Profile Cover</string>
-    <string name="profile_name">Profile Name</string>
-    <string name="profile_subtitle">Subtitle</string>
-    <string name="my_address_icon_desc">Address Icon</string>
-    <string name="my_address">My Address</string>
-    <string name="account_icon_desc">Account Icon</string>
-    <string name="account">Account</string>
-    <string name="notifications_icon_desc">Notifications Icon</string>
-    <string name="notifications">Notifications</string>
-    <string name="devices_icon_desc">Devices Icon</string>
-    <string name="devices">Devices</string>
-    <string name="passwords">Passwords</string>
-    <string name="language_icon_desc">Language Icon</string>
-    <string name="language">Language</string>
-    <string name="dark_mode">Dark Mode</string>
-    <string name="english">English</string>
+    <string name="chevron_desc">Icon mũi tên</string>
+    <string name="title_edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="profile_avatar">Ảnh đại diện</string>
+    <string name="passwords_icon_desc">Icon mật khẩu</string>
+    <string name="profile_cover_desc">Ảnh bìa</string>
+    <string name="profile_name">Tên hồ sơ</string>
+    <string name="profile_subtitle">Phụ đề</string>
+    <string name="my_address_icon_desc">Icon địa chỉ</string>
+    <string name="my_address">Địa chỉ của tôi</string>
+    <string name="account_icon_desc">Icon tài khoản</string>
+    <string name="account">Tài khoản</string>
+    <string name="notifications_icon_desc">Icon thông báo</string>
+    <string name="notifications">Thông báo</string>
+    <string name="devices_icon_desc">Icon thiết bị</string>
+    <string name="devices">Thiết bị</string>
+    <string name="passwords">Mật khẩu</string>
+    <string name="language_icon_desc">Icon ngôn ngữ</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="english">Tiếng Việt</string>
 
     <!-- Strings used by fragment_profile.xml (added) -->
-    <string name="my_profile">My Profile</string>
-    <string name="settings">Settings</string>
-    <string name="transaction_history">Transaction History</string>
-    <string name="faq">FAQ</string>
-    <string name="about_app">About App</string>
-    <string name="logout">Logout</string>
+    <string name="my_profile">Hồ sơ của tôi</string>
+    <string name="settings">Cài đặt</string>
+    <string name="transaction_history">Lịch sử giao dịch</string>
+    <string name="faq">Câu hỏi thường gặp</string>
+    <string name="about_app">Về ứng dụng</string>
+    <string name="logout">Đăng xuất</string>
 
     <!-- Strings added to fix layout warnings -->
-    <string name="btn_save">Save</string>
-    <string name="btn_back">Back</string>
-    <string name="password_label">Password</string>
-    <string name="toggle_password">Toggle password visibility</string>
+    <string name="btn_save">Lưu</string>
+    <string name="btn_back">Quay lại</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="toggle_password">Hiện/Ẩn mật khẩu</string>
 
     <!-- Profile labels and defaults (Vietnamese labels per design) -->
     <string name="rides_label">Chuyến đi</string>
@@ -89,8 +92,68 @@
     <string name="zero_km">0 km</string>
 
     <!-- Dev visual test string to confirm new layout is running -->
-    <string name="title_profile_dev">Profile (dev)</string>
-    <string name="terms_and_conditions_agreement"><![CDATA[I agree to the <a href="https://example.com/terms">terms and conditions</a> and <a href="https://example.com/privacy">privacy agreement</a>]]></string>
-    <string name="insurance_terms"><![CDATA[Insurance & Terms]]></string>
-    <string name="enter_your_full_name">Enter your full name</string>
+    <string name="title_profile_dev">Hồ sơ (dev)</string>
+    <string name="terms_and_conditions_agreement"><![CDATA[Tôi đồng ý với <a href="https://example.com/terms">điều khoản và điều kiện</a> và <a href="https://example.com/privacy">chính sách bảo mật</a>]]></string>
+    <string name="insurance_terms"><![CDATA[Bảo hiểm & Điều khoản]]></string>
+    <string name="enter_your_full_name">Nhập họ và tên</string>
+
+    <!-- Vehicle Details strings -->
+    <string name="vehicle_details">Chi tiết phương tiện</string>
+    <string name="battery">Pin</string>
+    <string name="range">Phạm vi</string>
+    <string name="seats">Chỗ ngồi</string>
+    <string name="station">Trạm</string>
+    <string name="price_per_day">/ ngày</string>
+    <string name="price_per_hour">/ giờ</string>
+    <string name="not_rated_yet">Chưa có đánh giá</string>
+    <string name="book_now">Đặt ngay</string>
+    <string name="specifications">Thông số kỹ thuật</string>
+    <string name="brand">Hãng xe</string>
+    <string name="model">Dòng xe</string>
+    <string name="year">Năm sản xuất</string>
+    <string name="color">Màu sắc</string>
+    <string name="plate_number">Biển số</string>
+    <string name="mileage">Số km đã đi</string>
+    <string name="status">Trạng thái</string>
+    <string name="available">Có sẵn</string>
+    <string name="rented">Đã thuê</string>
+    <string name="maintenance">Bảo trì</string>
+    <string name="unavailable">Không khả dụng</string>
+
+    <!-- Booking screen strings -->
+    <string name="my_bookings">Đặt xe của tôi</string>
+    <string name="booking_history">Lịch sử đặt xe</string>
+    <string name="active_bookings">Đang hoạt động</string>
+    <string name="completed_bookings">Đã hoàn thành</string>
+    <string name="cancelled_bookings">Đã hủy</string>
+    <string name="no_bookings">Chưa có đơn đặt xe nào</string>
+    <string name="no_bookings_message">Bạn chưa có đơn đặt xe nào. Hãy bắt đầu tìm kiếm và đặt xe ngay!</string>
+
+    <!-- Payment screen strings -->
+    <string name="payment_methods">Phương thức thanh toán</string>
+    <string name="select_payment_method">Chọn phương thức thanh toán</string>
+    <string name="payos">PayOS</string>
+    <string name="payos_description">Thanh toán nhanh chóng và an toàn</string>
+    <string name="cash_payment">Tiền mặt</string>
+    <string name="cash_description">Thanh toán khi nhận xe</string>
+    <string name="order_summary">Tóm tắt đơn hàng</string>
+    <string name="vehicle_rental">Xe thuê</string>
+    <string name="rental_duration">Thời gian thuê</string>
+    <string name="rental_fee">Giá thuê</string>
+    <string name="service_fee">Phí dịch vụ</string>
+    <string name="insurance">Bảo hiểm</string>
+    <string name="total">Tổng cộng</string>
+    <string name="proceed_payment">THANH TOÁN NGAY</string>
+    <string name="payment_security">Giao dịch được mã hóa và bảo mật</string>
+    <string name="qr_code">QR Code</string>
+    <string name="atm_card">ATM Card</string>
+    <string name="e_wallet">Ví điện tử</string>
+
+    <!-- Search and Home strings -->
+    <string name="pickup_location">Địa điểm nhận xe</string>
+    <string name="pickup_date">Ngày nhận</string>
+    <string name="return_date">Ngày trả</string>
+    <string name="fill_all_fields">Vui lòng điền đầy đủ thông tin</string>
+    <string name="searching_vehicles">Đang tìm xe tại %1$s từ %2$s đến %3$s</string>
 </resources>
+
