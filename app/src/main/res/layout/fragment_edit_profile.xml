@@ -20,7 +20,7 @@
         android:background="@color/white"
         android:elevation="2dp"
         android:padding="16dp">
-        
+
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="40dp"
@@ -30,7 +30,7 @@
             android:contentDescription="Quay lại"
             app:tint="@color/gray_900"
             android:padding="8dp" />
-            
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
