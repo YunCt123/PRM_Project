@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +27,7 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -34,9 +35,26 @@ public class ProfileFragment extends Fragment {
         profileViewModel.getName().observe(getViewLifecycleOwner(), name -> binding.tvName.setText(name));
         profileViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText(email));
 
-        // Thống kê chuy���n đi, quãng đường
+        // Thống kê chuyến đi, quãng đường
         profileViewModel.getRidesCount().observe(getViewLifecycleOwner(), count -> binding.tvRidesCount.setText(String.valueOf(count)));
         profileViewModel.getDistanceKm().observe(getViewLifecycleOwner(), d -> binding.tvDistance.setText(d));
+
+        // Observe loading state
+        profileViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null && isLoading) {
+                // Show loading indicator if you have one in layout
+                // binding.progressBar.setVisibility(View.VISIBLE);
+            } else {
+                // binding.progressBar.setVisibility(View.GONE);
+            }
+        });
+
+        // Observe error messages
+        profileViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Gán icon, tiêu đề, sự kiện cho từng mục menu
         setupMenuItems(root);
@@ -96,7 +114,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (profileViewModel != null) profileViewModel.reloadFromRepository();
+        // Reload profile data from API when fragment resumes
+        if (profileViewModel != null) {
+            profileViewModel.loadUserProfile();
+        }
     }
 
     @Override

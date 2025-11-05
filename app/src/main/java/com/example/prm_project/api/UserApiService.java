@@ -6,6 +6,7 @@ import com.example.prm_project.models.User;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
@@ -14,7 +15,18 @@ import retrofit2.http.Part;
 /**
  * API Service interface cho User endpoints
  */
-public interface    UserApiService {
+public interface UserApiService {
+
+    /**
+     * Get current user profile
+     * GET /api/users/me
+     * @param token Authorization Bearer token
+     * @return ApiResponse với User data
+     */
+    @GET("api/users/me")
+    Call<ApiResponse<User>> getUserProfile(
+            @Header("Authorization") String token
+    );
 
     /**
      * Update user profile with KYC documents
@@ -44,4 +56,3 @@ public interface    UserApiService {
             @Part MultipartBody.Part idBackImage
     );
 }
-
