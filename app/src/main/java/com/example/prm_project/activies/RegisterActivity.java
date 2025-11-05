@@ -1,5 +1,6 @@
 package com.example.prm_project.activies;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -13,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.prm_project.R;
+import com.example.prm_project.models.User;
+import com.example.prm_project.repository.AuthRepository;
+import com.example.prm_project.utils.SessionManager;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -21,12 +25,18 @@ public class RegisterActivity extends AppCompatActivity {
     private CheckBox cbTerms;
     private MaterialButton btnSignUp;
     private TextView tvSignIn;
+    
+    private AuthRepository authRepository;
+    private SessionManager sessionManager;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        authRepository = new AuthRepository();
+        sessionManager = new SessionManager(this);
         initViews();
         setClickListeners();
     }
@@ -116,13 +126,45 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Implement actual registration logic
-        Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
+        showProgressDialog("Đăng ký...");
+        
+        // Gọi API register - gender mặc định "male", role mặc định "renter"
+        authRepository.register(fullName, email, password, phone, "male", "renter", 
+            new AuthRepository.AuthCallback() {
+                @Override
+                public void onSuccess(User user, String token) {
+                    dismissProgressDialog();
+                    sessionManager.createLoginSession(user, token);
+                    Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                    navigateToMain();
+                }
 
-        // Navigate back to login
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                @Override
+                public void onError(String errorMessage) {
+                    dismissProgressDialog();
+                    Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+    
+    private void navigateToMain() {
+        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+    
+    private void showProgressDialog(String message) {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+    
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     private String getText(TextInputEditText editText) {

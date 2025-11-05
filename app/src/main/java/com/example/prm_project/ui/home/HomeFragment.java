@@ -20,6 +20,7 @@ import com.example.prm_project.R;
 import com.example.prm_project.activies.LoginActivity;
 import com.example.prm_project.databinding.FragmentHomeBinding;
 import com.example.prm_project.repository.VehicleRepository;
+import com.example.prm_project.utils.SessionManager;
 import com.example.prm_project.utils.VehicleConverter;
 
 import java.util.Calendar;
@@ -33,6 +34,7 @@ public class HomeFragment extends Fragment {
     private VehicleAdapter vehicleAdapter;
     private List<Vehicle> vehicleList;
     private VehicleRepository vehicleRepository;
+    private SessionManager sessionManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,14 +44,15 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Initialize repository
+        // Initialize session manager and repository
+        sessionManager = new SessionManager(getContext());
         vehicleRepository = new VehicleRepository();
 
         setupRecyclerView();
         setupDatePickers();
         setupSearchButton();
         loadVehicleDataFromApi();
-        login();
+        setupLoginLogoutButton();
 
         return root;
     }
@@ -117,6 +120,48 @@ public class HomeFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void setupLoginLogoutButton() {
+        loginButton = binding.getRoot().findViewById(R.id.btn_Login);
+        if (loginButton != null) {
+            updateButtonState();
+            
+            loginButton.setOnClickListener(v -> {
+                if (sessionManager.isLoggedIn()) {
+                    // Logout
+                    sessionManager.logout();
+                    Toast.makeText(getContext(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                    updateButtonState();
+                    
+                    // Optionally, navigate to LoginActivity
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                } else {
+                    // Login
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+    
+    private void updateButtonState() {
+        if (loginButton != null && sessionManager != null) {
+            if (sessionManager.isLoggedIn()) {
+                loginButton.setText("Logout");
+            } else {
+                loginButton.setText("Get Started");
+            }
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Update button state when returning to this fragment
+        updateButtonState();
     }
 
     private void searchVehicles(String location, String pickupDate, String returnDate) {
