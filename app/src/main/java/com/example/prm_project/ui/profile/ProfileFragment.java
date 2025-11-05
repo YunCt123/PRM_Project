@@ -1,5 +1,6 @@
 package com.example.prm_project.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.prm_project.R;
+import com.example.prm_project.activies.VerifyAccountActivity;
 import com.example.prm_project.databinding.FragmentProfileBinding;
 
 public class ProfileFragment extends Fragment {
@@ -61,7 +63,7 @@ public class ProfileFragment extends Fragment {
         ((ImageView) llVerify.findViewById(R.id.ivMenuIcon)).setImageResource(R.drawable.ic_check_black_24dp);
         ((TextView) llVerify.findViewById(R.id.tvMenuTitle)).setText("Xác minh tài khoản");
         llVerify.setOnClickListener(v -> {
-            android.content.Intent intent = new android.content.Intent(getActivity(), com.example.prm_project.VerifyAccountActivity.class);
+            Intent intent = new Intent(getActivity(), VerifyAccountActivity.class);
             startActivity(intent);
         });
 
