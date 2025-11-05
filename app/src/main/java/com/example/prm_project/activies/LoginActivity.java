@@ -3,7 +3,6 @@ package com.example.prm_project.activies;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,11 +19,11 @@ import com.example.prm_project.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "LoginActivity";
     private ImageView ivBack;
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnSignIn, btnGoogle, btnFacebook;
     private TextView tvForgotPassword, tvSignUp;
+    
     private AuthRepository authRepository;
     private SessionManager sessionManager;
     private ProgressDialog progressDialog;
@@ -32,18 +31,17 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        // Initialize repository and session manager
-        authRepository = new AuthRepository();
+        
+        // Khởi tạo SessionManager và kiểm tra auto-login
         sessionManager = new SessionManager(this);
-
-        // Check if user is already logged in
         if (sessionManager.isLoggedIn()) {
             navigateToMain();
             return;
         }
+        
+        setContentView(R.layout.activity_login);
 
+        authRepository = new AuthRepository();
         initViews();
         setClickListeners();
     }
@@ -86,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
         String email = getText(etEmail);
         String password = getText(etPassword);
 
-        // Validation
         if (email.isEmpty()) {
             etEmail.setError("Enter email");
             etEmail.requestFocus();
@@ -105,51 +102,39 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Show progress dialog
-        showProgressDialog("Đang đăng nhập...");
-
-        // Call API login
+        showProgressDialog("Đăng nhập...");
+        
         authRepository.login(email, password, new AuthRepository.AuthCallback() {
             @Override
             public void onSuccess(User user, String token) {
                 dismissProgressDialog();
-                
-                // Save session
                 sessionManager.createLoginSession(user, token);
-                
-                Log.d(TAG, "Login successful: " + user.getEmail());
                 Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                
-                // Navigate to main activity
                 navigateToMain();
             }
 
             @Override
             public void onError(String errorMessage) {
                 dismissProgressDialog();
-                
-                Log.e(TAG, "Login failed: " + errorMessage);
-                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }
-
+    
     private void navigateToMain() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
-
+    
     private void showProgressDialog(String message) {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setCancelable(false);
-        }
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
         progressDialog.show();
     }
-
+    
     private void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();

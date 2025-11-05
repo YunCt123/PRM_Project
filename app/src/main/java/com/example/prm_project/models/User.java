@@ -6,28 +6,28 @@ import com.google.gson.annotations.SerializedName;
  * User model representing user data from API
  */
 public class User {
-    
+
     @SerializedName("_id")
     private String id;
-    
+
     @SerializedName("name")
     private String name;
-    
+
     @SerializedName("email")
     private String email;
-    
+
     @SerializedName("phone")
     private String phone;
-    
+
     @SerializedName("gender")
     private String gender;
-    
+
     @SerializedName("role")
     private String role;
-    
+
     @SerializedName("createdAt")
     private String createdAt;
-    
+
     @SerializedName("updatedAt")
     private String updatedAt;
 
@@ -111,13 +111,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", gender='" + gender + '\'' +
-                ", role='" + role + '\'' +
-                '}';
+        return "User{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", email='" + email + '\'' + ", phone='" + phone + '\'' + ", gender='" + gender + '\'' + ", role='" + role + '\'' + '}';
     }
 }
