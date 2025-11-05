@@ -1,5 +1,6 @@
 package com.example.prm_project.activies;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -12,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.prm_project.R;
+import com.example.prm_project.models.User;
+import com.example.prm_project.repository.AuthRepository;
+import com.example.prm_project.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -19,12 +23,25 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnSignIn, btnGoogle, btnFacebook;
     private TextView tvForgotPassword, tvSignUp;
+    
+    private AuthRepository authRepository;
+    private SessionManager sessionManager;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Khởi tạo SessionManager và kiểm tra auto-login
+        sessionManager = new SessionManager(this);
+        if (sessionManager.isLoggedIn()) {
+            navigateToMain();
+            return;
+        }
+        
         setContentView(R.layout.activity_login);
 
+        authRepository = new AuthRepository();
         initViews();
         setClickListeners();
     }
@@ -85,13 +102,43 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // TODO: Implement actual login logic
-        Toast.makeText(this, "Signing in...", Toast.LENGTH_SHORT).show();
+        showProgressDialog("Đăng nhập...");
+        
+        authRepository.login(email, password, new AuthRepository.AuthCallback() {
+            @Override
+            public void onSuccess(User user, String token) {
+                dismissProgressDialog();
+                sessionManager.createLoginSession(user, token);
+                Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                navigateToMain();
+            }
 
-        // Navigate to main activity after successful login
+            @Override
+            public void onError(String errorMessage) {
+                dismissProgressDialog();
+                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    private void navigateToMain() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+    
+    private void showProgressDialog(String message) {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+    
+    private void dismissProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     private String getText(TextInputEditText editText) {
