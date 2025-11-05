@@ -27,15 +27,10 @@ public class ProfileFragment extends Fragment {
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        root.setBackgroundColor(getResources().getColor(R.color.white));
 
         // Header: cập nhật tên, email
-        View header = root.findViewById(R.id.header);
-        if (header != null) {
-            header.setBackgroundColor(getResources().getColor(R.color.purple_500));
-        }
-        profileViewModel.getName().observe(getViewLifecycleOwner(), name -> binding.tvName.setText("Name: " + name));
-        profileViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText("Email: " + email));
+        profileViewModel.getName().observe(getViewLifecycleOwner(), name -> binding.tvName.setText(name));
+        profileViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText(email));
 
         // Thống kê chuy���n đi, quãng đường
         profileViewModel.getRidesCount().observe(getViewLifecycleOwner(), count -> binding.tvRidesCount.setText(String.valueOf(count)));
@@ -75,12 +70,6 @@ public class ProfileFragment extends Fragment {
         ((ImageView) llHistory.findViewById(R.id.ivMenuIcon)).setImageResource(R.drawable.ic_calendar_24dp);
         ((TextView) llHistory.findViewById(R.id.tvMenuTitle)).setText("Lịch sử thuê xe");
         llHistory.setOnClickListener(v -> Toast.makeText(getContext(), "Lịch sử thuê xe", Toast.LENGTH_SHORT).show());
-
-        // Phương thức thanh toán
-        LinearLayout llPayment = root.findViewById(R.id.llPayment);
-        ((ImageView) llPayment.findViewById(R.id.ivMenuIcon)).setImageResource(R.drawable.ic_credit_card);
-        ((TextView) llPayment.findViewById(R.id.tvMenuTitle)).setText("Phương thức thanh toán");
-        llPayment.setOnClickListener(v -> Toast.makeText(getContext(), "Phương thức thanh toán", Toast.LENGTH_SHORT).show());
 
         // Cài đặt
         LinearLayout llSettings = root.findViewById(R.id.llSettings);
