@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Initialize repository and session manager
-        authRepository = new AuthRepository();
+        authRepository = new AuthRepository(this);
         sessionManager = new SessionManager(this);
 
         // Check if user is already logged in

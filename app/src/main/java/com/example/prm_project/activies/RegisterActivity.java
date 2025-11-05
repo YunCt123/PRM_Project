@@ -37,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // Initialize repository and session manager
-        authRepository = new AuthRepository();
+        authRepository = new AuthRepository(this);
         sessionManager = new SessionManager(this);
 
         initViews();

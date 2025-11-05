@@ -15,6 +15,12 @@ public class Booking {
     @SerializedName("deposit")
     private Deposit deposit;
 
+    @SerializedName("qrCode")
+    private String qrCode;
+
+    @SerializedName("checkoutUrl")
+    private String checkoutUrl;
+
     public Booking(String vehicleId, String startTime, String endTime, Deposit deposit) {
         this.vehicleId = vehicleId;
         this.startTime = startTime;
@@ -52,6 +58,22 @@ public class Booking {
 
     public void setDeposit(Deposit deposit) {
         this.deposit = deposit;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public String getCheckoutUrl() {
+        return checkoutUrl;
+    }
+
+    public void setCheckoutUrl(String checkoutUrl) {
+        this.checkoutUrl = checkoutUrl;
     }
 
     public static class Deposit {

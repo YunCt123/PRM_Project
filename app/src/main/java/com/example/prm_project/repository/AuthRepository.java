@@ -1,5 +1,6 @@
 package com.example.prm_project.repository;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.prm_project.api.ApiClient;
@@ -22,6 +23,10 @@ public class AuthRepository {
 
     public AuthRepository() {
         this.apiService = ApiClient.getClient().create(AuthApiService.class);
+    }
+
+    public AuthRepository(Context context) {
+        this.apiService = ApiClient.getAuthenticatedClient(context).create(AuthApiService.class);
     }
 
     /**

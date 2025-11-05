@@ -1,9 +1,13 @@
 package com.example.prm_project.api;
 
+import android.content.Context;
+
+import com.example.prm_project.utils.SessionManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -11,6 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
     private static final String BASE_URL = "https://be-ev-rental-system-production.up.railway.app/";
     private static Retrofit retrofit;
+    private static Retrofit authenticatedRetrofit;
 
     public static Retrofit getClient() {
         if (retrofit == null) {
@@ -18,7 +23,7 @@ public class ApiClient {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            // OkHttp client with logging
+            // OkHttp client with logging only (no auth)
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(logging)
                     .build();
@@ -35,5 +40,43 @@ public class ApiClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static Retrofit getAuthenticatedClient(Context context) {
+        if (authenticatedRetrofit == null) {
+            // Logging interceptor for debugging
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            // OkHttp client builder with auth interceptor
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .addInterceptor(chain -> {
+                        Request original = chain.request();
+                        SessionManager sessionManager = new SessionManager(context);
+                        String token = sessionManager.getToken();
+
+                        Request.Builder requestBuilder = original.newBuilder();
+                        if (token != null && !token.isEmpty()) {
+                            requestBuilder.addHeader("Authorization", "Bearer " + token);
+                        }
+
+                        Request request = requestBuilder.build();
+                        return chain.proceed(request);
+                    })
+                    .build();
+
+            // Gson configuration
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+
+            authenticatedRetrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
+        return authenticatedRetrofit;
     }
 }
