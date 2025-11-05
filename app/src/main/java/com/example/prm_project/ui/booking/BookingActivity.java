@@ -20,10 +20,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
 import com.example.prm_project.R;
+import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.Vehicle;
+import com.example.prm_project.repository.BookingRespository;
+import com.example.prm_project.repository.VehicleRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class BookingActivity extends AppCompatActivity {
 
@@ -49,7 +54,11 @@ public class BookingActivity extends AppCompatActivity {
     private String vehicleName;
     private String vehiclePrice;
     private int vehicleImageRes;
+    private String vehicleId;
     private int documentsUploaded = 0;
+    private BookingRespository bookingRepository;
+    private VehicleRepository vehicleRepository;
+    private Vehicle vehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +76,18 @@ public class BookingActivity extends AppCompatActivity {
             vehicleName = intent.getStringExtra("vehicle_name");
             vehiclePrice = intent.getStringExtra("vehicle_price");
             vehicleImageRes = intent.getIntExtra("vehicle_image", R.drawable.xe1);
+            vehicleId = intent.getStringExtra("vehicle_id");
+            if (vehicleId != null) {
+                fetchVehicleDetails(vehicleId);
+            }
         }
 
         initViews();
         setupClickListeners();
         initializeCalendars();
         setupSpinner();
+        bookingRepository = new BookingRespository();
+        vehicleRepository = new VehicleRepository();
     }
 
     private void initViews() {
@@ -115,7 +130,7 @@ public class BookingActivity extends AppCompatActivity {
         // Set vehicle data
         ivVehicleImage.setImageResource(vehicleImageRes);
         tvVehicleName.setText(vehicleName);
-        tvPrice.setText(vehiclePrice != null ? vehiclePrice + "/hour" : "$18/hour");
+        tvPrice.setText("Loading price..."); // Will be updated after fetching vehicle details
 
         // Setup terms text with HTML links
         setupTermsText();
@@ -242,9 +257,22 @@ public class BookingActivity extends AppCompatActivity {
             return;
         }
 
-        // Show success message and finish
-        Toast.makeText(this, "Proceeding to payment for " + vehicleName + "!", Toast.LENGTH_LONG).show();
-        // TODO: Navigate to payment screen
+        // Check if vehicle details are loaded
+        if (vehicle == null) {
+            Toast.makeText(this, "Vehicle details not loaded yet. Please wait.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Navigate to PaymentActivity with booking details
+        Intent paymentIntent = new Intent(this, com.example.prm_project.activies.PaymentActivity.class);
+        paymentIntent.putExtra("vehicle_name", vehicleName);
+        paymentIntent.putExtra("vehicle_id", this.vehicleId);
+
+        // Pass pickup and return times for booking creation
+        paymentIntent.putExtra("pickup_time", pickupCalendar.getTimeInMillis());
+        paymentIntent.putExtra("return_time", returnCalendar.getTimeInMillis());
+
+        startActivity(paymentIntent);
         finish();
     }
 
@@ -287,6 +315,30 @@ public class BookingActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void fetchVehicleDetails(String vehicleId) {
+        vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
+            @Override
+            public void onSuccess(Vehicle fetchedVehicle) {
+                vehicle = fetchedVehicle;
+                // Update price display
+                if (vehicle != null) {
+                    tvPrice.setText(String.format("%.0f VND/hour", vehicle.getPricePerHour()));
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(BookingActivity.this, "Failed to load vehicle details: " + errorMessage, Toast.LENGTH_SHORT).show();
+                tvPrice.setText("Price unavailable");
+            }
+        });
+    }
+
+    private String formatDateTime(Calendar calendar) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        return sdf.format(calendar.getTime());
     }
 
     private void setupBackButton() {

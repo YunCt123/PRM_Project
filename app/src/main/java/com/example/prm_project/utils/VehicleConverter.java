@@ -32,7 +32,7 @@ public class VehicleConverter {
         // hoặc có thể API có field riêng cho range
         int estimatedRange = apiVehicle.getBatteryCapacity() * 5; // Ước tính
 
-        // Tạo UI Vehicle với brand từ API
+        // Tạo UI Vehicle với brand và id từ API
         return new com.example.prm_project.ui.home.Vehicle(
                 apiVehicle.getFullName(),                           // name: "Xiaomi SU7"
                 details,                                            // details: "2024 • Xanh"
@@ -46,7 +46,8 @@ public class VehicleConverter {
                 apiVehicle.getRatingText(),                         // rating: "Chưa có đánh giá"
                 "Tốt",                                              // condition (default)
                 imageUrl,                                           // imageUrl từ API
-                apiVehicle.getBrand()                               // brand từ API để filter
+                apiVehicle.getBrand(),                              // brand từ API để filter
+                apiVehicle.getId()                                  // id từ API
         );
     }
 

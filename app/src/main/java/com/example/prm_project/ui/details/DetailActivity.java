@@ -21,6 +21,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private Vehicle vehicle;
     private String vehicleImageUrl;
+    private String vehicleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,9 @@ public class DetailActivity extends AppCompatActivity {
         // Get vehicle data from intent
         Intent intent = getIntent();
         if (intent != null) {
+            vehicleId = intent.getStringExtra("vehicle_id");
+            vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
+
             vehicle = new Vehicle(
                 intent.getStringExtra("vehicle_name"),
                 intent.getStringExtra("vehicle_details"),
@@ -46,10 +50,11 @@ public class DetailActivity extends AppCompatActivity {
                 intent.getStringExtra("vehicle_price_details"),
                 intent.getStringExtra("vehicle_status"),
                 intent.getStringExtra("vehicle_rating"),
-                intent.getStringExtra("vehicle_condition")
+                intent.getStringExtra("vehicle_condition"),
+                vehicleImageUrl,
+                null, // brand
+                vehicleId // id
             );
-            
-            vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
 
             setupViews();
         }
@@ -108,7 +113,8 @@ public class DetailActivity extends AppCompatActivity {
             // Navigate to PaymentActivity
             Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
             paymentIntent.putExtra("vehicle_name", vehicle.getName());
-            
+            paymentIntent.putExtra("vehicle_id", vehicleId);
+
             // Extract price number from string like "$80" or "$80/day"
             String priceStr = vehicle.getPrice().replace("$", "").split("/")[0].trim();
             try {
@@ -117,7 +123,7 @@ public class DetailActivity extends AppCompatActivity {
             } catch (NumberFormatException e) {
                 paymentIntent.putExtra("daily_rate", 80.0); // Default value
             }
-            
+
             paymentIntent.putExtra("rental_period", "1 ngày"); // Default 1 day
             startActivity(paymentIntent);
         });

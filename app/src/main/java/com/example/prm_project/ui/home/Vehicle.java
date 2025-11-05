@@ -14,6 +14,7 @@ public class Vehicle {
     private String condition;
     private String imageUrl;  // URL hình ảnh từ API
     private String brand;     // Brand từ API để filter
+    private String id;        // Vehicle ID từ API
 
     public Vehicle(String name, String details, String batteryPercent, String range,
                   String seats, String location, String price, String priceDetails,
@@ -69,6 +70,27 @@ public class Vehicle {
         this.condition = condition;
         this.imageUrl = imageUrl;
         this.brand = brand;
+        this.id = null;
+    }
+
+    // Constructor với imageUrl, brand và id
+    public Vehicle(String name, String details, String batteryPercent, String range,
+                  String seats, String location, String price, String priceDetails,
+                  String status, String rating, String condition, String imageUrl, String brand, String id) {
+        this.name = name;
+        this.details = details;
+        this.batteryPercent = batteryPercent;
+        this.range = range;
+        this.seats = seats;
+        this.location = location;
+        this.price = price;
+        this.priceDetails = priceDetails;
+        this.status = status;
+        this.rating = rating;
+        this.condition = condition;
+        this.imageUrl = imageUrl;
+        this.brand = brand;
+        this.id = id;
     }
 
     // Getters
@@ -85,6 +107,7 @@ public class Vehicle {
     public String getCondition() { return condition; }
     public String getImageUrl() { return imageUrl; }
     public String getBrand() { return brand; }
+    public String getId() { return id; }
 
     // Setters
     public void setName(String name) { this.name = name; }
@@ -100,4 +123,5 @@ public class Vehicle {
     public void setCondition(String condition) { this.condition = condition; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public void setBrand(String brand) { this.brand = brand; }
+    public void setId(String id) { this.id = id; }
 }

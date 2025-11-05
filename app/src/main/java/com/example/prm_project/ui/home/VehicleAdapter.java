@@ -80,6 +80,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
+            intent.putExtra("vehicle_id", vehicle.getId());  // Pass vehicle ID
             
             context.startActivity(intent);
         });
@@ -87,12 +88,16 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.btnBookNow.setOnClickListener(v -> {
             // Navigate to PaymentActivity
             Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
-            
+
             // Pass vehicle data
             intent.putExtra("vehicle_name", vehicle.getName());
             intent.putExtra("vehicle_price", vehicle.getPrice());
             intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
-            
+            intent.putExtra("vehicle_id", vehicle.getId());  // Pass vehicle ID
+
+            // Pass numeric prices if available (will be set from API fetch)
+            // For now, we'll still fetch in PaymentActivity to ensure accuracy
+
             context.startActivity(intent);
         });
 
@@ -113,7 +118,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
-            
+            intent.putExtra("vehicle_id", vehicle.getId());  // Pass vehicle ID
+
             context.startActivity(intent);
         });
     }

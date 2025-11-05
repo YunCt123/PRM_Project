@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,6 +18,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_project.R;
+import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.Vehicle;
+import com.example.prm_project.repository.BookingRespository;
+import com.example.prm_project.repository.VehicleRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -34,11 +39,19 @@ public class PaymentActivity extends AppCompatActivity {
     private MaterialButton btnProceedPayment;
     
     private String vehicleName;
-    private double unitPricePerHour = 22.0; // 22đ/giờ
-    private double unitPricePerDay = 150.0; // 150đ/ngày
+    private String vehicleId;
+    private long pickupTimeMillis;
+    private long returnTimeMillis;
+
+    private double vehicleRent;
+    private double unitPricePerHour = 0.0; // Will be set from API
+    private double unitPricePerDay = 0.0; // Will be set from API
     private int duration = 0;
     private boolean isDaily = true;
     private double totalPrice = 0;
+    private VehicleRepository vehicleRepository;
+    private BookingRespository bookingRepository;
+    private Vehicle vehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,8 @@ public class PaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment);
         
         initViews();
+        vehicleRepository = new VehicleRepository();
+        bookingRepository = new BookingRespository();
         getIntentData();
         setupListeners();
         calculateTotal();
@@ -76,15 +91,50 @@ public class PaymentActivity extends AppCompatActivity {
     private void getIntentData() {
         Intent intent = getIntent();
         vehicleName = intent.getStringExtra("vehicle_name");
-        
+        vehicleId = intent.getStringExtra("vehicle_id");
+        pickupTimeMillis = intent.getLongExtra("pickup_time", 0);
+        returnTimeMillis = intent.getLongExtra("return_time", 0);
+
+        // Debug logging
+        Log.d("PaymentActivity", "vehicleName: " + vehicleName);
+        Log.d("PaymentActivity", "vehicleId: " + vehicleId);
+        Log.d("PaymentActivity", "pickupTime: " + pickupTimeMillis + ", returnTime: " + returnTimeMillis);
+
         // Set default values if not provided
         if (vehicleName == null) vehicleName = "VinFast VF8";
-        
+
         // Update UI
         tvVehicleName.setText(vehicleName);
-        tvPickupTime.setText(getCurrentTime());
+        if (pickupTimeMillis > 0) {
+            tvPickupTime.setText(new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                    .format(new java.util.Date(pickupTimeMillis)));
+        } else {
+            tvPickupTime.setText(getCurrentTime());
+        }
         tvPickupLocation.setText("EV Station - Nguyen Hue");
-        updatePriceDisplay();
+
+        // Calculate duration from times if provided
+        if (pickupTimeMillis > 0 && returnTimeMillis > 0) {
+            long diffMillis = returnTimeMillis - pickupTimeMillis;
+            long hours = diffMillis / (1000 * 60 * 60);
+            if (isDaily) {
+                duration = (int) Math.ceil(hours / 24.0); // Convert to days
+            } else {
+                duration = (int) hours;
+            }
+            etDuration.setText(String.valueOf(duration));
+        }
+
+        // Fetch vehicle details if vehicleId is provided
+        if (vehicleId != null && !vehicleId.isEmpty()) {
+            fetchVehicleDetails(vehicleId);
+        } else {
+            // No vehicleId provided, show error and disable payment
+            Toast.makeText(this, "Không có thông tin xe, không thể tính giá", Toast.LENGTH_SHORT).show();
+            btnProceedPayment.setEnabled(false);
+            btnProceedPayment.setBackgroundTintList(getResources().getColorStateList(R.color.gray_300, null));
+            btnProceedPayment.setTextColor(getColor(R.color.gray_500));
+        }
     }
     
     private String getCurrentTime() {
@@ -92,6 +142,35 @@ public class PaymentActivity extends AppCompatActivity {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         return String.format("%02d:%02d", hour, minute);
+    }
+
+    private void fetchVehicleDetails(String vehicleId) {
+        Log.d("PaymentActivity", "Fetching vehicle details for ID: " + vehicleId);
+        vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
+            @Override
+            public void onSuccess(Vehicle fetchedVehicle) {
+                Log.d("PaymentActivity", "Vehicle fetched successfully: " + fetchedVehicle);
+                if (fetchedVehicle != null) {
+                    Log.d("PaymentActivity", "PricePerHour: " + fetchedVehicle.getPricePerHour() + ", PricePerDay: " + fetchedVehicle.getPricePerDay());
+                }
+                vehicle = fetchedVehicle;
+                if (vehicle != null) {
+                    unitPricePerHour = vehicle.getPricePerHour();
+                    unitPricePerDay = vehicle.getPricePerDay();
+                    updatePriceDisplay();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("PaymentActivity", "Error fetching vehicle: " + errorMessage);
+                Toast.makeText(PaymentActivity.this, "Không thể tải thông tin xe: " + errorMessage, Toast.LENGTH_SHORT).show();
+                // Disable payment since we can't calculate prices
+                btnProceedPayment.setEnabled(false);
+                btnProceedPayment.setBackgroundTintList(getResources().getColorStateList(R.color.gray_300, null));
+                btnProceedPayment.setTextColor(getColor(R.color.gray_500));
+            }
+        });
     }
 
     private void setupListeners() {
@@ -249,24 +328,65 @@ public class PaymentActivity extends AppCompatActivity {
             // Simulate payment processing
             new android.os.Handler().postDelayed(() -> {
                 processingDialog.dismiss();
-                
+
+                // Create booking after successful payment
+                createBookingAfterPayment(selectedOption);
+            }, 2000);
+        });
+        
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void createBookingAfterPayment(String paymentMethod) {
+        if (vehicleId == null || vehicle == null) {
+            Toast.makeText(this, "Không có thông tin xe để tạo booking", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Use the times from BookingActivity
+        String startTime = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+                .format(new java.util.Date(pickupTimeMillis));
+        String endTime = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+                .format(new java.util.Date(returnTimeMillis));
+
+        // Create deposit
+        long depositAmount = (long) totalPrice;
+        Booking.Deposit deposit = new Booking.Deposit(depositAmount, "VND", "PayOS", "PAYOS" + System.currentTimeMillis());
+
+        // Create booking
+        Booking booking = new Booking(vehicleId, startTime, endTime, deposit);
+
+        // Call API to create booking
+        bookingRepository.createBooking(booking).observe(this, result -> {
+            if (result != null) {
                 // Show success message
-                Toast.makeText(this, "Thanh toán thành công qua " + selectedOption, Toast.LENGTH_SHORT).show();
-                
+                Toast.makeText(this, "Thanh toán và đặt xe thành công qua " + paymentMethod, Toast.LENGTH_SHORT).show();
+
                 // Return result
                 Intent intent = new Intent();
-                intent.putExtra("payment_method", "PayOS - " + selectedOption);
+                intent.putExtra("payment_method", "PayOS - " + paymentMethod);
+                intent.putExtra("amount", totalPrice);
+                intent.putExtra("duration", duration);
+                intent.putExtra("rental_type", isDaily ? "Theo ngày" : "Theo giờ");
+                intent.putExtra("transaction_id", "PAYOS" + System.currentTimeMillis());
+                intent.putExtra("booking_id", result.getVehicleId()); // Or whatever ID the API returns
+                setResult(RESULT_OK, intent);
+                finish();
+            } else {
+                Log.e("PaymentActivity", "Booking creation failed after payment");
+                Toast.makeText(this, "Thanh toán thành công nhưng không thể tạo booking. Vui lòng liên hệ hỗ trợ.", Toast.LENGTH_SHORT).show();
+                // Still return success for payment
+                Intent intent = new Intent();
+                intent.putExtra("payment_method", "PayOS - " + paymentMethod);
                 intent.putExtra("amount", totalPrice);
                 intent.putExtra("duration", duration);
                 intent.putExtra("rental_type", isDaily ? "Theo ngày" : "Theo giờ");
                 intent.putExtra("transaction_id", "PAYOS" + System.currentTimeMillis());
                 setResult(RESULT_OK, intent);
                 finish();
-            }, 2000);
+            }
         });
-        
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
-        builder.show();
     }
 
     @Override
