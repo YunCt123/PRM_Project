@@ -21,6 +21,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private Vehicle vehicle;
     private String vehicleImageUrl;
+    private String vehicleId;
+    private double pricePerDay;
+    private double pricePerHour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,11 @@ public class DetailActivity extends AppCompatActivity {
         // Get vehicle data from intent
         Intent intent = getIntent();
         if (intent != null) {
+            // Get vehicle ID and prices
+            vehicleId = intent.getStringExtra("vehicle_id");
+            pricePerDay = intent.getDoubleExtra("price_per_day", 0);
+            pricePerHour = intent.getDoubleExtra("price_per_hour", 0);
+            
             vehicle = new Vehicle(
                 intent.getStringExtra("vehicle_name"),
                 intent.getStringExtra("vehicle_details"),
@@ -107,18 +115,20 @@ public class DetailActivity extends AppCompatActivity {
         btnBookNow.setOnClickListener(v -> {
             // Navigate to PaymentActivity
             Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
+            
+            // Pass vehicle ID
+            paymentIntent.putExtra("vehicle_id", vehicleId);
+            
+            // Pass vehicle name
             paymentIntent.putExtra("vehicle_name", vehicle.getName());
             
-            // Extract price number from string like "$80" or "$80/day"
-            String priceStr = vehicle.getPrice().replace("$", "").split("/")[0].trim();
-            try {
-                double price = Double.parseDouble(priceStr);
-                paymentIntent.putExtra("daily_rate", price);
-            } catch (NumberFormatException e) {
-                paymentIntent.putExtra("daily_rate", 80.0); // Default value
-            }
+            // Pass station name (location)
+            paymentIntent.putExtra("station_name", vehicle.getLocation());
             
-            paymentIntent.putExtra("rental_period", "1 ngày"); // Default 1 day
+            // Pass prices (số thực)
+            paymentIntent.putExtra("price_per_day", pricePerDay);
+            paymentIntent.putExtra("price_per_hour", pricePerHour);
+            
             startActivity(paymentIntent);
         });
 

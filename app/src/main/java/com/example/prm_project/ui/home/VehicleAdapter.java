@@ -46,6 +46,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.tvPrice.setText(vehicle.getPrice());
         holder.tvPriceDetails.setText(vehicle.getPriceDetails());
         holder.tvStatus.setText(vehicle.getStatus());
+        holder.tvLocation.setText("📍 " + vehicle.getLocation());
+        holder.tvSeats.setText("👥 " + vehicle.getSeats());
 
         // Load image from URL using Glide
         if (vehicle.getImageUrl() != null && !vehicle.getImageUrl().isEmpty()) {
@@ -68,6 +70,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
             
             // Pass vehicle data via intent
+            intent.putExtra("vehicle_id", vehicle.getId());  // Add vehicle ID
             intent.putExtra("vehicle_name", vehicle.getName());
             intent.putExtra("vehicle_details", vehicle.getDetails());
             intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
@@ -80,18 +83,22 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
             
             context.startActivity(intent);
         });
 
         holder.btnBookNow.setOnClickListener(v -> {
-            // Navigate to PaymentActivity
+            // Navigate to PaymentActivity directly
             Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
             
             // Pass vehicle data
+            intent.putExtra("vehicle_id", vehicle.getId());
             intent.putExtra("vehicle_name", vehicle.getName());
-            intent.putExtra("vehicle_price", vehicle.getPrice());
-            intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
+            intent.putExtra("station_name", vehicle.getLocation());  // Station name
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());
             
             context.startActivity(intent);
         });
@@ -101,6 +108,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             // Same navigation as VIEW button
             Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
             
+            intent.putExtra("vehicle_id", vehicle.getId());  // Add vehicle ID
             intent.putExtra("vehicle_name", vehicle.getName());
             intent.putExtra("vehicle_details", vehicle.getDetails());
             intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
@@ -113,6 +121,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
             
             context.startActivity(intent);
         });
@@ -132,6 +142,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         TextView tvPrice;
         TextView tvPriceDetails;
         TextView tvStatus;
+        TextView tvLocation;
+        TextView tvSeats;
         Button btnViewDetails;
         Button btnBookNow;
 
@@ -146,6 +158,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             tvPrice = itemView.findViewById(R.id.tv_price);
             tvPriceDetails = itemView.findViewById(R.id.tv_price_details);
             tvStatus = itemView.findViewById(R.id.tv_status);
+            tvLocation = itemView.findViewById(R.id.tv_location);
+            tvSeats = itemView.findViewById(R.id.tv_seats);
             btnViewDetails = itemView.findViewById(R.id.btn_view_details);
             btnBookNow = itemView.findViewById(R.id.btn_book_now);
         }

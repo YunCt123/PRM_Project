@@ -134,45 +134,24 @@
 
                 </RadioGroup>
 
-                <!-- Duration Input -->
+                <!-- Start Date Time -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thời gian thuê"
-                    android:textSize="14sp"
-                    android:textColor="@color/gray_600"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/etDuration"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_input_field"
-                    android:hint="Nhập số ngày/giờ"
-                    android:inputType="number"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Pickup Time -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Thời gian nhận xe"
+                    android:text="Ngày giờ bắt đầu"
                     android:textSize="14sp"
                     android:textColor="@color/gray_600"
                     android:layout_marginBottom="8dp" />
 
                 <TextView
-                    android:id="@+id/tvPickupTime"
+                    android:id="@+id/tvStartDateTime"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/bg_input_field"
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="20:58"
+                    android:text="Chọn ngày giờ bắt đầu"
                     android:textSize="14sp"
                     android:textColor="@color/gray_900"
                     android:drawableEnd="@drawable/ic_time"
@@ -180,6 +159,83 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:layout_marginBottom="12dp" />
+
+                <!-- Hourly Duration Input (only visible when "Theo giờ" selected) -->
+                <TextView
+                    android:id="@+id/tvHourlyDurationLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Số giờ thuê"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_600"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/etHourlyDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Nhập số giờ (VD: 2, 5, 12)"
+                    android:inputType="number"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <!-- End Date Time (only visible when "Theo ngày" selected) -->
+                <TextView
+                    android:id="@+id/tvEndDateTimeLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ngày giờ kết thúc"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_600"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEndDateTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input_field"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Chọn ngày giờ kết thúc"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_900"
+                    android:drawableEnd="@drawable/ic_time"
+                    android:drawablePadding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Duration Display (Auto calculated) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Thời gian thuê"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_600" />
+
+                    <TextView
+                        android:id="@+id/tvDurationCalculated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 ngày 0 giờ"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_blue" />
+
+                </LinearLayout>
 
                 <!-- Pickup Location -->
                 <TextView
