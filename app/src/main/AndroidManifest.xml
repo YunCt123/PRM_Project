@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Storage permissions for image upload -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -53,18 +58,18 @@
             android:label="Chi tiết đặt xe"
             android:parentActivityName=".activies.MainActivity" />
 
-        <!-- Verify Account Activity -->
-        <activity
-            android:name=".VerifyAccountActivity"
-            android:exported="false"
-            android:label="Xác minh tài khoản"
-            android:parentActivityName=".activies.MainActivity" />
-
         <!-- Payment Activity -->
         <activity
             android:name=".activies.PaymentActivity"
             android:exported="false"
             android:label="Thanh toán"
+            android:parentActivityName=".activies.MainActivity" />
+
+        <!-- Verify Account Activity -->
+        <activity
+            android:name=".activies.VerifyAccountActivity"
+            android:exported="false"
+            android:label="Xác minh tài khoản"
             android:parentActivityName=".activies.MainActivity" />
 
     </application>

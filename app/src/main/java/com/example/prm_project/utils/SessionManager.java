@@ -15,9 +15,12 @@ public class SessionManager {
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_PHONE = "userPhone";
+    private static final String KEY_USER_DATE_OF_BIRTH = "userDateOfBirth";
     private static final String KEY_USER_GENDER = "userGender";
     private static final String KEY_USER_ROLE = "userRole";
     private static final String KEY_TOKEN = "token";
+    private static final String KEY_IS_VERIFIED = "isVerified";
+    private static final String KEY_KYC_STATUS = "kycStatus";
 
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
@@ -38,9 +41,18 @@ public class SessionManager {
         editor.putString(KEY_USER_NAME, user.getName());
         editor.putString(KEY_USER_EMAIL, user.getEmail());
         editor.putString(KEY_USER_PHONE, user.getPhone());
+        editor.putString(KEY_USER_DATE_OF_BIRTH, user.getDateOfBirth());
         editor.putString(KEY_USER_GENDER, user.getGender());
         editor.putString(KEY_USER_ROLE, user.getRole());
         editor.putString(KEY_TOKEN, token);
+
+        // Save verification info - now correctly using "verified" field from backend
+        editor.putBoolean(KEY_IS_VERIFIED, user.getVerified());
+
+        // Save KYC status based on verification logic
+        String kycStatus = user.getVerificationStatus();
+        editor.putString(KEY_KYC_STATUS, kycStatus);
+
         editor.apply();
     }
 
@@ -64,8 +76,14 @@ public class SessionManager {
         user.setName(prefs.getString(KEY_USER_NAME, ""));
         user.setEmail(prefs.getString(KEY_USER_EMAIL, ""));
         user.setPhone(prefs.getString(KEY_USER_PHONE, ""));
+        user.setDateOfBirth(prefs.getString(KEY_USER_DATE_OF_BIRTH, ""));
         user.setGender(prefs.getString(KEY_USER_GENDER, ""));
         user.setRole(prefs.getString(KEY_USER_ROLE, ""));
+
+        // restore verification info
+        boolean isVerified = prefs.getBoolean(KEY_IS_VERIFIED, false);
+        user.setVerified(isVerified);
+
         return user;
     }
 
@@ -95,6 +113,20 @@ public class SessionManager {
      */
     public String getUserEmail() {
         return prefs.getString(KEY_USER_EMAIL, "");
+    }
+
+    /**
+     * Get whether user has been verified
+     */
+    public boolean isVerified() {
+        return prefs.getBoolean(KEY_IS_VERIFIED, false);
+    }
+
+    /**
+     * Get KYC status string (e.g., "pending", "verified")
+     */
+    public String getKycStatus() {
+        return prefs.getString(KEY_KYC_STATUS, "unverified");
     }
 
     /**

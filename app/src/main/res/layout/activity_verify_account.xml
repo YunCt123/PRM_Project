@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,12 +21,13 @@
 
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="12dp"
                 android:background="@drawable/bg_circle_button"
                 android:src="@drawable/ic_chevron_left_24dp"
                 app:tint="@color/black"
-                android:contentDescription="Back" />
+                android:contentDescription="@string/app_name" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,6 +40,19 @@
                 android:layout_marginStart="12dp" />
         </LinearLayout>
 
+        <!-- KYC status -->
+        <TextView
+            android:id="@+id/tvKycStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_input_field"
+            android:text="Trạng thái: Chưa gửi"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <!-- CMND/CCCD Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,41 +74,92 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="16dp" />
 
-                <LinearLayout
+                <!-- ID Front -->
+                <FrameLayout
                     android:id="@+id/layoutIdFront"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="160dp"
                     android:background="@drawable/bg_input_field"
-                    android:gravity="center"
                     android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tải ảnh mặt trước" />
+                    <ImageView
+                        android:id="@+id/ivIdFront"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="ID Front"
+                        android:visibility="gone" />
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/layoutIdFrontPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                <LinearLayout
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_camera_alt_24dp"
+                            android:contentDescription="Upload"
+                            app:tint="@color/gray_500"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tải ảnh mặt trước"
+                            android:textColor="@color/gray_500" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- ID Back -->
+                <FrameLayout
                     android:id="@+id/layoutIdBack"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="160dp"
                     android:background="@drawable/bg_input_field"
-                    android:gravity="center"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tải ảnh mặt sau" />
+                    <ImageView
+                        android:id="@+id/ivIdBack"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="ID Back"
+                        android:visibility="gone" />
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/layoutIdBackPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_camera_alt_24dp"
+                            android:contentDescription="Upload"
+                            app:tint="@color/gray_500"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tải ảnh mặt sau"
+                            android:textColor="@color/gray_500" />
+                    </LinearLayout>
+                </FrameLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- License Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,49 +181,101 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="16dp" />
 
-                <LinearLayout
+                <!-- License Front -->
+                <FrameLayout
                     android:id="@+id/layoutLicenseFront"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="160dp"
                     android:background="@drawable/bg_input_field"
-                    android:gravity="center"
                     android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tải ảnh mặt trước" />
+                    <ImageView
+                        android:id="@+id/ivLicenseFront"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="License Front"
+                        android:visibility="gone" />
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/layoutLicenseFrontPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                <LinearLayout
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_camera_alt_24dp"
+                            android:contentDescription="Upload"
+                            app:tint="@color/gray_500"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tải ảnh mặt trước"
+                            android:textColor="@color/gray_500" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- License Back -->
+                <FrameLayout
                     android:id="@+id/layoutLicenseBack"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="160dp"
                     android:background="@drawable/bg_input_field"
-                    android:gravity="center"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tải ảnh mặt sau" />
+                    <ImageView
+                        android:id="@+id/ivLicenseBack"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="License Back"
+                        android:visibility="gone" />
 
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/layoutLicenseBackPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_camera_alt_24dp"
+                            android:contentDescription="Upload"
+                            app:tint="@color/gray_500"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tải ảnh mặt sau"
+                            android:textColor="@color/gray_500" />
+                    </LinearLayout>
+                </FrameLayout>
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Submit Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmit"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Gửi xác minh"
-            android:backgroundTint="@color/primary_blue"
+            android:backgroundTint="@color/gray_300"
             android:textColor="@color/white"
-            android:layout_margin="16dp" />
+            android:layout_margin="16dp"
+            android:enabled="false" />
 
     </LinearLayout>
 

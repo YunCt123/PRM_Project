@@ -5,7 +5,7 @@
     <string name="title_search">Search</string>
     <string name="title_booking">Booking</string>
     <string name="title_profile">Profile</string>
-    
+
     <string name="login">Đăng nhập</string>
 
     <!-- Login screen strings -->
@@ -96,7 +96,7 @@
     <string name="terms_and_conditions_agreement"><![CDATA[Tôi đồng ý với <a href="https://example.com/terms">điều khoản và điều kiện</a> và <a href="https://example.com/privacy">chính sách bảo mật</a>]]></string>
     <string name="insurance_terms"><![CDATA[Bảo hiểm & Điều khoản]]></string>
     <string name="enter_your_full_name">Nhập họ và tên</string>
-    
+
     <!-- Vehicle Details strings -->
     <string name="vehicle_details">Chi tiết phương tiện</string>
     <string name="battery">Pin</string>
@@ -148,7 +148,7 @@
     <string name="qr_code">QR Code</string>
     <string name="atm_card">ATM Card</string>
     <string name="e_wallet">Ví điện tử</string>
-    
+
     <!-- Search and Home strings -->
     <string name="pickup_location">Địa điểm nhận xe</string>
     <string name="pickup_date">Ngày nhận</string>
