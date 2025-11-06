@@ -264,7 +264,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
     
     private void openVerifyScreen() {
-        Intent intent = new Intent(this, com.example.prm_project.VerifyAccountActivity.class);
+        Intent intent = new Intent(this, VerifyAccountActivity.class);
         startActivity(intent);
     }
 
