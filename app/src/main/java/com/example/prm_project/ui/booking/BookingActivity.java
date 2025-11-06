@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,22 +18,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
 import androidx.core.text.HtmlCompat;
 
 import com.example.prm_project.R;
+import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.Vehicle;
+import com.example.prm_project.repository.BookingRepository;
+import com.example.prm_project.repository.VehicleRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class BookingActivity extends AppCompatActivity {
 
     private TextView tvPickupDate, tvReturnDate, tvPickupTime, tvReturnTime;
+    private TextInputEditText etDuration;
     private TextView tvVehicleName, tvPrice, tvUploadProgress;
     private ImageView ivVehicleImage;
     private Calendar pickupCalendar, returnCalendar;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private boolean pickupTimeSelected = false;
 
     // Customer Information
     private EditText etFullName, etEmail, etPhone, etLicenseNumber;
@@ -49,7 +59,11 @@ public class BookingActivity extends AppCompatActivity {
     private String vehicleName;
     private String vehiclePrice;
     private int vehicleImageRes;
+    private String vehicleId;
     private int documentsUploaded = 0;
+    private BookingRepository bookingRepository;
+    private VehicleRepository vehicleRepository;
+    private Vehicle vehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +81,18 @@ public class BookingActivity extends AppCompatActivity {
             vehicleName = intent.getStringExtra("vehicle_name");
             vehiclePrice = intent.getStringExtra("vehicle_price");
             vehicleImageRes = intent.getIntExtra("vehicle_image", R.drawable.xe1);
+            vehicleId = intent.getStringExtra("vehicle_id");
+            if (vehicleId != null) {
+                fetchVehicleDetails(vehicleId);
+            }
         }
 
         initViews();
         setupClickListeners();
         initializeCalendars();
         setupSpinner();
+        bookingRepository = new BookingRepository(this);
+        vehicleRepository = new VehicleRepository();
     }
 
     private void initViews() {
@@ -89,6 +109,7 @@ public class BookingActivity extends AppCompatActivity {
         tvReturnDate = findViewById(R.id.tv_return_date);
         tvPickupTime = findViewById(R.id.tv_pickup_time);
         tvReturnTime = findViewById(R.id.tv_return_time);
+        etDuration = findViewById(R.id.et_duration);
 
         // Customer Information
         etFullName = findViewById(R.id.et_full_name);
@@ -115,7 +136,7 @@ public class BookingActivity extends AppCompatActivity {
         // Set vehicle data
         ivVehicleImage.setImageResource(vehicleImageRes);
         tvVehicleName.setText(vehicleName);
-        tvPrice.setText(vehiclePrice != null ? vehiclePrice + "/hour" : "$18/hour");
+        tvPrice.setText("Loading price..."); // Will be updated after fetching vehicle details
 
         // Setup terms text with HTML links
         setupTermsText();
@@ -136,9 +157,21 @@ public class BookingActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         tvPickupDate.setOnClickListener(v -> showDatePicker(true));
-        tvReturnDate.setOnClickListener(v -> showDatePicker(false));
         tvPickupTime.setOnClickListener(v -> showTimePicker(true));
-        tvReturnTime.setOnClickListener(v -> showTimePicker(false));
+
+        // Add text change listener for duration to recalculate return time
+        etDuration.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                calculateReturnTime();
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
 
         // Upload area click listeners
         uploadAreaLicense.setOnClickListener(v -> {
@@ -162,6 +195,17 @@ public class BookingActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, rentalTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerRentalType.setAdapter(adapter);
+
+        // Add listener to recalculate return time when rental type changes
+        spinnerRentalType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                calculateReturnTime();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
     }
 
     private void simulateUpload() {
@@ -180,13 +224,19 @@ public class BookingActivity extends AppCompatActivity {
     private void initializeCalendars() {
         pickupCalendar = Calendar.getInstance();
         returnCalendar = Calendar.getInstance();
-        returnCalendar.add(Calendar.DAY_OF_MONTH, 3); // Default return date is 3 days later
+        // Set default return time to 1 day later
+        returnCalendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        Log.d("BookingActivity", "Calendars initialized - pickup: " + pickupCalendar.getTime() + ", return: " + returnCalendar.getTime());
+        Log.d("BookingActivity", "Calendars millis - pickup: " + pickupCalendar.getTimeInMillis() + ", return: " + returnCalendar.getTimeInMillis());
 
         updateDateTimeDisplays();
     }
 
     private void showDatePicker(boolean isPickup) {
+        Log.d("BookingActivity", "showDatePicker called - isPickup: " + isPickup);
         Calendar calendar = isPickup ? pickupCalendar : returnCalendar;
+        Log.d("BookingActivity", "Current calendar time: " + calendar.getTime());
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(
             this,
@@ -194,6 +244,10 @@ public class BookingActivity extends AppCompatActivity {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                if (isPickup) {
+                    pickupTimeSelected = true;
+                    calculateReturnTime();
+                }
                 updateDateTimeDisplays();
             },
             calendar.get(Calendar.YEAR),
@@ -207,14 +261,25 @@ public class BookingActivity extends AppCompatActivity {
     }
 
     private void showTimePicker(boolean isPickup) {
+        Log.d("BookingActivity", "showTimePicker called - isPickup: " + isPickup);
         Calendar calendar = isPickup ? pickupCalendar : returnCalendar;
+        Log.d("BookingActivity", "Current calendar time: " + calendar.getTime());
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(
             this,
             (view, hourOfDay, minute) -> {
                 calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 calendar.set(Calendar.MINUTE, minute);
+                if (isPickup) {
+                    pickupTimeSelected = true;
+                    calculateReturnTime();
+                }
                 updateDateTimeDisplays();
+
+                // Log the selected duration in hours
+                long diffMillis = returnCalendar.getTimeInMillis() - pickupCalendar.getTimeInMillis();
+                double hours = diffMillis / (1000.0 * 60 * 60);
+                Log.d("BookingActivity", "Selected duration in hours: " + hours);
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
@@ -222,6 +287,58 @@ public class BookingActivity extends AppCompatActivity {
         );
 
         timePickerDialog.show();
+    }
+
+    private void calculateReturnTime() {
+        String durationText = etDuration.getText() != null ? etDuration.getText().toString().trim() : "";
+        if (durationText.isEmpty()) {
+            // Set default return time to 1 day later
+            returnCalendar = (Calendar) pickupCalendar.clone();
+            returnCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            updateDateTimeDisplays();
+            return;
+        }
+
+        try {
+            int duration = Integer.parseInt(durationText);
+            if (duration <= 0) {
+                return;
+            }
+
+            // Clone pickup calendar to avoid modifying original
+            returnCalendar = (Calendar) pickupCalendar.clone();
+
+            // Get selected rental type
+            String selectedType = spinnerRentalType.getSelectedItem() != null ?
+                    spinnerRentalType.getSelectedItem().toString() : "Daily Rental";
+
+            // Calculate return time based on rental type
+            switch (selectedType) {
+                case "Hourly Rental":
+                    returnCalendar.add(Calendar.HOUR_OF_DAY, duration);
+                    break;
+                case "Daily Rental":
+                    returnCalendar.add(Calendar.DAY_OF_MONTH, duration);
+                    break;
+                case "Weekly Rental":
+                    returnCalendar.add(Calendar.DAY_OF_MONTH, duration * 7);
+                    break;
+                case "Monthly Rental":
+                    returnCalendar.add(Calendar.MONTH, duration);
+                    break;
+                default:
+                    returnCalendar.add(Calendar.DAY_OF_MONTH, duration);
+                    break;
+            }
+
+            updateDateTimeDisplays();
+
+        } catch (NumberFormatException e) {
+            // Invalid duration, set default to 1 day
+            returnCalendar = (Calendar) pickupCalendar.clone();
+            returnCalendar.add(Calendar.DAY_OF_MONTH, 1);
+            updateDateTimeDisplays();
+        }
     }
 
     private void updateDateTimeDisplays() {
@@ -237,14 +354,51 @@ public class BookingActivity extends AppCompatActivity {
             return;
         }
 
-        if (returnCalendar.getTimeInMillis() <= pickupCalendar.getTimeInMillis()) {
-            Toast.makeText(this, "Return time must be after pickup time", Toast.LENGTH_SHORT).show();
+        // Check if user has selected pickup time
+        if (!pickupTimeSelected) {
+            Toast.makeText(this, "Please select pickup date and time", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Show success message and finish
-        Toast.makeText(this, "Proceeding to payment for " + vehicleName + "!", Toast.LENGTH_LONG).show();
-        // TODO: Navigate to payment screen
+        // Check if pickup time is not in the past
+        long currentTime = System.currentTimeMillis();
+        long pickupTime = pickupCalendar.getTimeInMillis();
+        if (pickupTime < currentTime - 300000) { // More than 5 minutes ago
+            Toast.makeText(this, "Pickup time cannot be in the past", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Ensure return time is after pickup time
+        if (returnCalendar.getTimeInMillis() <= pickupCalendar.getTimeInMillis()) {
+            // Force return time to be at least 1 hour after pickup
+            returnCalendar = (Calendar) pickupCalendar.clone();
+            returnCalendar.add(Calendar.HOUR_OF_DAY, 1);
+            Toast.makeText(this, "Return time adjusted to be after pickup time", Toast.LENGTH_SHORT).show();
+        }
+
+        // Check if vehicle details are loaded
+        if (vehicle == null) {
+            Toast.makeText(this, "Vehicle details not loaded yet. Please wait.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Navigate to PaymentActivity with booking details
+        Intent paymentIntent = new Intent(this, com.example.prm_project.activies.PaymentActivity.class);
+        paymentIntent.putExtra("vehicle_name", vehicleName);
+        paymentIntent.putExtra("vehicle_id", this.vehicleId);
+
+        // Pass pickup and return times for booking creation
+        Log.d("BookingActivity", "About to send times - pickup calendar: " + pickupCalendar.getTime() + ", return calendar: " + returnCalendar.getTime());
+        long pickupMillis = pickupCalendar.getTimeInMillis();
+        long returnMillis = returnCalendar.getTimeInMillis();
+        Log.d("BookingActivity", "Sending pickupTime: " + pickupMillis + " (" + new java.util.Date(pickupMillis) + ")");
+        Log.d("BookingActivity", "Sending returnTime: " + returnMillis + " (" + new java.util.Date(returnMillis) + ")");
+        Log.d("BookingActivity", "Time difference: " + (returnMillis - pickupMillis) + " ms");
+
+        paymentIntent.putExtra("pickup_time", pickupMillis);
+        paymentIntent.putExtra("return_time", returnMillis);
+
+        startActivity(paymentIntent);
         finish();
     }
 
@@ -274,6 +428,27 @@ public class BookingActivity extends AppCompatActivity {
             return false;
         }
 
+        // Check duration
+        String durationText = etDuration.getText() != null ? etDuration.getText().toString().trim() : "";
+        if (durationText.isEmpty()) {
+            etDuration.setError("Duration is required");
+            etDuration.requestFocus();
+            return false;
+        }
+
+        try {
+            int duration = Integer.parseInt(durationText);
+            if (duration <= 0) {
+                etDuration.setError("Duration must be greater than 0");
+                etDuration.requestFocus();
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            etDuration.setError("Please enter a valid number");
+            etDuration.requestFocus();
+            return false;
+        }
+
         // Check documents uploaded
         if (documentsUploaded < 3) {
             Toast.makeText(this, "Please upload all required documents", Toast.LENGTH_SHORT).show();
@@ -287,6 +462,30 @@ public class BookingActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void fetchVehicleDetails(String vehicleId) {
+        vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
+            @Override
+            public void onSuccess(Vehicle fetchedVehicle) {
+                vehicle = fetchedVehicle;
+                // Update price display
+                if (vehicle != null) {
+                    tvPrice.setText(String.format("%.0f VND/hour", vehicle.getPricePerHour()));
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(BookingActivity.this, "Failed to load vehicle details: " + errorMessage, Toast.LENGTH_SHORT).show();
+                tvPrice.setText("Price unavailable");
+            }
+        });
+    }
+
+    private String formatDateTime(Calendar calendar) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        return sdf.format(calendar.getTime());
     }
 
     private void setupBackButton() {

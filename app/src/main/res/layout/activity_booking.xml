@@ -311,6 +311,30 @@
                     android:background="@drawable/bg_input_field"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Duration Input -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Duration"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_600"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="Enter duration (e.g., 4 days, 8 hours)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_duration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="3" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <!-- Rental Period -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -358,16 +382,14 @@
                         android:layout_weight="1"
                         android:text="2025-10-29"
                         android:textSize="16sp"
-                        android:textColor="@color/gray_900"
-                        android:background="@drawable/bg_input_field"
+                        android:textColor="@color/gray_700"
+                        android:background="@drawable/bg_light_gray_rounded"
                         android:gravity="center"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:layout_marginStart="4dp"
-                        android:drawableEnd="@drawable/ic_calendar"
-                        android:drawablePadding="8dp" />
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:layout_marginStart="4dp" />
 
                 </LinearLayout>
 
@@ -420,9 +442,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="End Time"
+                            android:text="End Time (calculated)"
                             android:textSize="14sp"
-                            android:textColor="@color/gray_600"
+                            android:textColor="@color/gray_500"
                             android:layout_marginBottom="4dp" />
 
                         <TextView
@@ -431,15 +453,13 @@
                             android:layout_height="48dp"
                             android:text="18:00"
                             android:textSize="16sp"
-                            android:textColor="@color/gray_900"
-                            android:background="@drawable/bg_input_field"
+                            android:textColor="@color/gray_700"
+                            android:background="@drawable/bg_light_gray_rounded"
                             android:gravity="center_vertical"
                             android:paddingStart="16dp"
                             android:paddingEnd="16dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:drawableEnd="@drawable/ic_time"
-                            android:drawablePadding="8dp" />
+                            android:clickable="false"
+                            android:focusable="false" />
 
                     </LinearLayout>
 

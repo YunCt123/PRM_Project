@@ -45,32 +45,50 @@ public class User {
     private Kyc kyc;
 
     public static class Kyc {
+        @SerializedName("idNumber")
+        private String idNumber;
+
+        @SerializedName("licenseNumber")
+        private String licenseNumber;
+
         @SerializedName("idFrontImage")
-        private String idFrontImage;
+        private ImageObject idFrontImage;
 
         @SerializedName("idBackImage")
-        private String idBackImage;
+        private ImageObject idBackImage;
 
         @SerializedName("licenseFrontImage")
-        private String licenseFrontImage;
+        private ImageObject licenseFrontImage;
 
         @SerializedName("licenseBackImage")
-        private String licenseBackImage;
+        private ImageObject licenseBackImage;
+
+        @SerializedName("verified")
+        private Boolean verified;
 
         @SerializedName("verifiedAt")
         private String verifiedAt;
 
-        public String getIdFrontImage() { return idFrontImage; }
-        public void setIdFrontImage(String idFrontImage) { this.idFrontImage = idFrontImage; }
+        public String getIdNumber() { return idNumber; }
+        public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
 
-        public String getIdBackImage() { return idBackImage; }
-        public void setIdBackImage(String idBackImage) { this.idBackImage = idBackImage; }
+        public String getLicenseNumber() { return licenseNumber; }
+        public void setLicenseNumber(String licenseNumber) { this.licenseNumber = licenseNumber; }
 
-        public String getLicenseFrontImage() { return licenseFrontImage; }
-        public void setLicenseFrontImage(String licenseFrontImage) { this.licenseFrontImage = licenseFrontImage; }
+        public ImageObject getIdFrontImage() { return idFrontImage; }
+        public void setIdFrontImage(ImageObject idFrontImage) { this.idFrontImage = idFrontImage; }
 
-        public String getLicenseBackImage() { return licenseBackImage; }
-        public void setLicenseBackImage(String licenseBackImage) { this.licenseBackImage = licenseBackImage; }
+        public ImageObject getIdBackImage() { return idBackImage; }
+        public void setIdBackImage(ImageObject idBackImage) { this.idBackImage = idBackImage; }
+
+        public ImageObject getLicenseFrontImage() { return licenseFrontImage; }
+        public void setLicenseFrontImage(ImageObject licenseFrontImage) { this.licenseFrontImage = licenseFrontImage; }
+
+        public ImageObject getLicenseBackImage() { return licenseBackImage; }
+        public void setLicenseBackImage(ImageObject licenseBackImage) { this.licenseBackImage = licenseBackImage; }
+
+        public Boolean getVerified() { return verified; }
+        public void setVerified(Boolean verified) { this.verified = verified; }
 
         public String getVerifiedAt() { return verifiedAt; }
         public void setVerifiedAt(String verifiedAt) { this.verifiedAt = verifiedAt; }
@@ -163,20 +181,40 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    // Verification helpers - updated to use "verified" field
+    // Verification helpers - get from kyc object (backend structure)
     public Boolean getIsVerified() {
-        return verified != null ? verified : false;
+        // Check kyc.verified (correct location in backend response)
+        if (kyc != null && kyc.getVerified() != null) {
+            return kyc.getVerified();
+        }
+        return false;
     }
 
     public void setIsVerified(Boolean verified) {
+        // Also set in kyc object
+        if (kyc == null) {
+            kyc = new Kyc();
+        }
+        kyc.setVerified(verified);
+        // Keep root level for backward compatibility
         this.verified = verified;
     }
 
     public Boolean getVerified() {
-        return verified != null ? verified : false;
+        // Check kyc.verified (correct location in backend response)
+        if (kyc != null && kyc.getVerified() != null) {
+            return kyc.getVerified();
+        }
+        return false;
     }
 
     public void setVerified(Boolean verified) {
+        // Also set in kyc object
+        if (kyc == null) {
+            kyc = new Kyc();
+        }
+        kyc.setVerified(verified);
+        // Keep root level for backward compatibility
         this.verified = verified;
     }
 
@@ -195,8 +233,8 @@ public class User {
      * Returns a simple verification status string: "verified", "pending", or "unverified"
      */
     public String getVerificationStatus() {
-        // If verified is true and has verifiedAt date, user is fully verified
-        if (verified != null && verified && verifiedAt != null) {
+        // Check verification status from kyc object (correct location in backend response)
+        if (kyc != null && kyc.getVerified() != null && kyc.getVerified()) {
             return "verified";
         }
         // If has KYC images uploaded but not yet verified, status is pending

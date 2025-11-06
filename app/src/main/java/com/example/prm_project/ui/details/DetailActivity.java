@@ -7,12 +7,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.PaymentActivity;
+import com.example.prm_project.activies.VerifyAccountActivity;
 import com.example.prm_project.ui.home.Vehicle;
+import com.example.prm_project.utils.SessionManager;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -21,11 +24,18 @@ public class DetailActivity extends AppCompatActivity {
 
     private Vehicle vehicle;
     private String vehicleImageUrl;
+    private String vehicleId;
+    private double pricePerDay;
+    private double pricePerHour;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        // Initialize SessionManager
+        sessionManager = new SessionManager(this);
 
         // Hide action bar
         if (getSupportActionBar() != null) {
@@ -35,21 +45,33 @@ public class DetailActivity extends AppCompatActivity {
         // Get vehicle data from intent
         Intent intent = getIntent();
         if (intent != null) {
-            vehicle = new Vehicle(
-                intent.getStringExtra("vehicle_name"),
-                intent.getStringExtra("vehicle_details"),
-                intent.getStringExtra("vehicle_battery"),
-                intent.getStringExtra("vehicle_range"),
-                intent.getStringExtra("vehicle_seats"),
-                intent.getStringExtra("vehicle_location"),
-                intent.getStringExtra("vehicle_price"),
-                intent.getStringExtra("vehicle_price_details"),
-                intent.getStringExtra("vehicle_status"),
-                intent.getStringExtra("vehicle_rating"),
-                intent.getStringExtra("vehicle_condition")
-            );
+            // Get vehicle ID and prices
+            vehicleId = intent.getStringExtra("vehicle_id");
+            pricePerDay = intent.getDoubleExtra("price_per_day", 0);
+            pricePerHour = intent.getDoubleExtra("price_per_hour", 0);
             
+            vehicleId = intent.getStringExtra("vehicle_id");
             vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
+
+            // Use constructor with ID and prices
+            vehicle = new Vehicle(
+                vehicleId,                                          // id
+                intent.getStringExtra("vehicle_name"),              // name
+                intent.getStringExtra("vehicle_details"),           // details
+                intent.getStringExtra("vehicle_battery"),           // batteryPercent
+                intent.getStringExtra("vehicle_range"),             // range
+                intent.getStringExtra("vehicle_seats"),             // seats
+                intent.getStringExtra("vehicle_location"),          // location
+                intent.getStringExtra("vehicle_price"),             // price
+                intent.getStringExtra("vehicle_price_details"),     // priceDetails
+                intent.getStringExtra("vehicle_status"),            // status
+                intent.getStringExtra("vehicle_rating"),            // rating
+                intent.getStringExtra("vehicle_condition"),         // condition
+                vehicleImageUrl,                                    // imageUrl
+                null,                                               // brand
+                pricePerDay,                                        // pricePerDay
+                pricePerHour                                        // pricePerHour
+            );
 
             setupViews();
         }
@@ -105,20 +127,28 @@ public class DetailActivity extends AppCompatActivity {
 
         // Set click listeners
         btnBookNow.setOnClickListener(v -> {
-            // Navigate to PaymentActivity
-            Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
-            paymentIntent.putExtra("vehicle_name", vehicle.getName());
-            
-            // Extract price number from string like "$80" or "$80/day"
-            String priceStr = vehicle.getPrice().replace("$", "").split("/")[0].trim();
-            try {
-                double price = Double.parseDouble(priceStr);
-                paymentIntent.putExtra("daily_rate", price);
-            } catch (NumberFormatException e) {
-                paymentIntent.putExtra("daily_rate", 80.0); // Default value
+            // Check if user is verified before allowing booking
+            if (!sessionManager.isVerified()) {
+                showVerificationRequiredDialog();
+                return;
             }
             
-            paymentIntent.putExtra("rental_period", "1 ngày"); // Default 1 day
+            // User is verified, proceed to payment
+            Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
+            
+            // Pass vehicle ID
+            paymentIntent.putExtra("vehicle_id", vehicleId);
+            
+            // Pass vehicle name
+            paymentIntent.putExtra("vehicle_name", vehicle.getName());
+            
+            // Pass station name (location)
+            paymentIntent.putExtra("station_name", vehicle.getLocation());
+            
+            // Pass prices (số thực)
+            paymentIntent.putExtra("price_per_day", pricePerDay);
+            paymentIntent.putExtra("price_per_hour", pricePerHour);
+            
             startActivity(paymentIntent);
         });
 
@@ -126,7 +156,33 @@ public class DetailActivity extends AppCompatActivity {
             finish(); // Close this activity and return to previous screen
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload session data in case user just verified their account
+        // SessionManager will automatically get updated data from SharedPreferences
+    }
     
+    /**
+     * Show dialog when user is not verified
+     */
+    private void showVerificationRequiredDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Yêu cầu xác minh tài khoản")
+                .setMessage("Bạn cần xác minh tài khoản trước khi có thể đặt xe. Vui lòng hoàn tất việc xác minh để tiếp tục.")
+                .setPositiveButton("Xác minh ngay", (dialog, which) -> {
+                    // Navigate to VerifyAccountActivity
+                    Intent verifyIntent = new Intent(DetailActivity.this, VerifyAccountActivity.class);
+                    startActivity(verifyIntent);
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
+    }
+
     /**
      * Format price to Vietnamese format
      */

@@ -15,7 +15,10 @@ public class AuthResponse {
     
     @SerializedName("data")
     private AuthData data;
-    
+
+    @SerializedName("token")
+    private String token;
+
     @SerializedName("error")
     private String error;
 
@@ -77,12 +80,24 @@ public class AuthResponse {
         this.error = error;
     }
 
+    public String getRootToken() {
+        return token;
+    }
+
+    public void setRootToken(String token) {
+        this.token = token;
+    }
+
     // Helper methods
     public User getUser() {
         return data != null ? data.getUser() : null;
     }
 
     public String getToken() {
+        // Check root level token first, then data.token
+        if (token != null && !token.isEmpty()) {
+            return token;
+        }
         return data != null ? data.getToken() : null;
     }
 }
