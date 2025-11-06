@@ -1,5 +1,6 @@
 package com.example.prm_project.api;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -23,6 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
     private static final String BASE_URL = "https://be-ev-rental-system-production.up.railway.app/";
     private static Retrofit retrofit;
+    private static Retrofit authenticatedRetrofit;
     private static final String MULTIPART_TAG = "MultipartDebug";
 
     public static Retrofit getClient() {
