@@ -92,7 +92,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.btnBookNow.setOnClickListener(v -> {
             // Navigate to PaymentActivity directly
             Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
-            
+
             // Pass vehicle data
             intent.putExtra("vehicle_id", vehicle.getId());
             intent.putExtra("vehicle_name", vehicle.getName());

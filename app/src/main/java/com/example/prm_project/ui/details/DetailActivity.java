@@ -43,6 +43,9 @@ public class DetailActivity extends AppCompatActivity {
             pricePerDay = intent.getDoubleExtra("price_per_day", 0);
             pricePerHour = intent.getDoubleExtra("price_per_hour", 0);
             
+            vehicleId = intent.getStringExtra("vehicle_id");
+            vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
+
             vehicle = new Vehicle(
                 intent.getStringExtra("vehicle_name"),
                 intent.getStringExtra("vehicle_details"),
@@ -54,10 +57,11 @@ public class DetailActivity extends AppCompatActivity {
                 intent.getStringExtra("vehicle_price_details"),
                 intent.getStringExtra("vehicle_status"),
                 intent.getStringExtra("vehicle_rating"),
-                intent.getStringExtra("vehicle_condition")
+                intent.getStringExtra("vehicle_condition"),
+                vehicleImageUrl,
+                null, // brand
+                vehicleId // id
             );
-            
-            vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
 
             setupViews();
         }

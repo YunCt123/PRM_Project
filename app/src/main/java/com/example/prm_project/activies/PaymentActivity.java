@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -86,6 +87,8 @@ public class PaymentActivity extends AppCompatActivity {
         endDateTime.add(Calendar.DAY_OF_MONTH, 1);
         
         initViews();
+        vehicleRepository = new VehicleRepository();
+        bookingRepository = new BookingRespository(this);
         getIntentData();
         setupListeners();
         
@@ -140,6 +143,35 @@ public class PaymentActivity extends AppCompatActivity {
         tvPickupLocation.setText(stationName);
     }
 
+    private void fetchVehicleDetails(String vehicleId) {
+        Log.d("PaymentActivity", "Fetching vehicle details for ID: " + vehicleId);
+        vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
+            @Override
+            public void onSuccess(Vehicle fetchedVehicle) {
+                Log.d("PaymentActivity", "Vehicle fetched successfully: " + fetchedVehicle);
+                if (fetchedVehicle != null) {
+                    Log.d("PaymentActivity", "PricePerHour: " + fetchedVehicle.getPricePerHour() + ", PricePerDay: " + fetchedVehicle.getPricePerDay());
+                }
+                vehicle = fetchedVehicle;
+                if (vehicle != null) {
+                    unitPricePerHour = vehicle.getPricePerHour();
+                    unitPricePerDay = vehicle.getPricePerDay();
+                    updatePriceDisplay();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("PaymentActivity", "Error fetching vehicle: " + errorMessage);
+                Toast.makeText(PaymentActivity.this, "Không thể tải thông tin xe: " + errorMessage, Toast.LENGTH_SHORT).show();
+                // Disable payment since we can't calculate prices
+                btnProceedPayment.setEnabled(false);
+                btnProceedPayment.setBackgroundTintList(getResources().getColorStateList(R.color.gray_300, null));
+                btnProceedPayment.setTextColor(getColor(R.color.gray_500));
+            }
+        });
+    }
+
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
         
@@ -160,7 +192,7 @@ public class PaymentActivity extends AppCompatActivity {
         etHourlyDuration.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isDaily && s.length() > 0) {
@@ -175,7 +207,7 @@ public class PaymentActivity extends AppCompatActivity {
                     }
                 }
             }
-            
+
             @Override
             public void afterTextChanged(Editable s) {}
         });
@@ -337,7 +369,7 @@ public class PaymentActivity extends AppCompatActivity {
             Toast.makeText(this, "Không tìm thấy thông tin xe", Toast.LENGTH_SHORT).show();
             return;
         }
-        
+
         // Show loading dialog
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Đang tạo booking với PayOS...");

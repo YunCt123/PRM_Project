@@ -323,7 +323,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Daily Rate -->
+                <!-- Deposit -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -334,7 +334,33 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Giá thuê (4 ngày)"
+                        android:text="Tiền cọc"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_600" />
+
+                    <TextView
+                        android:id="@+id/tvDeposit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="$250,000,000"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_900" />
+
+                </LinearLayout>
+
+                <!-- Daily Rate -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/tvRentalPriceLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Giá thuê"
                         android:textSize="14sp"
                         android:textColor="@color/gray_600" />
 
@@ -348,32 +374,7 @@
 
                 </LinearLayout>
 
-                <!-- Service Fee -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Phí dịch vụ"
-                        android:textSize="14sp"
-                        android:textColor="@color/gray_600" />
-
-                    <TextView
-                        android:id="@+id/tvServiceFee"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="$20"
-                        android:textSize="14sp"
-                        android:textColor="@color/gray_900" />
-
-                </LinearLayout>
-
-                <!-- Insurance -->
+                <!-- Tax -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -384,12 +385,12 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Bảo hiểm"
+                        android:text="Thuế"
                         android:textSize="14sp"
                         android:textColor="@color/gray_600" />
 
                     <TextView
-                        android:id="@+id/tvInsurance"
+                        android:id="@+id/tvTax"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="$20"
@@ -447,10 +448,25 @@
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPayment"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Thanh toán"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/primary_green"
+                android:textColor="@color/white"
+                app:cornerRadius="12dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContactSupport"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_weight="1"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:text="Hỗ trợ"
                 android:textSize="14sp"

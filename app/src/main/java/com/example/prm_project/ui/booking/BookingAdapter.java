@@ -2,6 +2,7 @@ package com.example.prm_project.ui.booking;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,13 +56,22 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             holder.tvBookingStatus.setTextColor(context.getResources().getColor(android.R.color.holo_green_dark));
         } else if ("CANCELLED".equals(booking.getStatus())) {
             holder.tvBookingStatus.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+        } else if ("EXPIRED".equals(booking.getStatus())) {
+            holder.tvBookingStatus.setTextColor(context.getResources().getColor(android.R.color.holo_orange_dark));
         }
 
-        // Show/hide cancel button based on status
+        // Show/hide buttons based on status and availability
         if ("ACTIVE".equals(booking.getStatus())) {
             holder.btnCancelBooking.setVisibility(View.VISIBLE);
         } else {
             holder.btnCancelBooking.setVisibility(View.GONE);
+        }
+
+        // Show payment button if checkout URL is available
+        if (booking.getCheckoutUrl() != null && !booking.getCheckoutUrl().isEmpty()) {
+            holder.btnPayment.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnPayment.setVisibility(View.GONE);
         }
 
         // Set click listeners
@@ -69,15 +79,16 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             // Navigate to booking details
             Intent intent = new Intent(context, BookingDetailsActivity.class);
             intent.putExtra("BOOKING_ID", booking.getBookingId());
-            intent.putExtra("VEHICLE_NAME", booking.getVehicleName());
-            intent.putExtra("PICKUP_DATE", booking.getPickupDate());
-            intent.putExtra("PICKUP_TIME", booking.getPickupTime());
-            intent.putExtra("RETURN_DATE", booking.getReturnDate());
-            intent.putExtra("RETURN_TIME", booking.getReturnTime());
-            intent.putExtra("TOTAL_PRICE", booking.getTotalPrice());
-            intent.putExtra("STATUS", booking.getStatus());
-            intent.putExtra("STATUS_TEXT", booking.getStatusText());
             context.startActivity(intent);
+        });
+
+        holder.btnPayment.setOnClickListener(v -> {
+            if (booking.getCheckoutUrl() != null && !booking.getCheckoutUrl().isEmpty()) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(booking.getCheckoutUrl()));
+                context.startActivity(browserIntent);
+            } else {
+                Toast.makeText(context, "Không tìm thấy liên kết thanh toán", Toast.LENGTH_SHORT).show();
+            }
         });
 
         holder.btnCancelBooking.setOnClickListener(v -> {
@@ -106,6 +117,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         TextView tvReturnTime;
         TextView tvTotalPrice;
         Button btnViewDetails;
+        Button btnPayment;
         Button btnCancelBooking;
 
         public BookingViewHolder(@NonNull View itemView) {
@@ -120,6 +132,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             tvReturnTime = itemView.findViewById(R.id.tvReturnTime);
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
             btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
+            btnPayment = itemView.findViewById(R.id.btnPayment);
             btnCancelBooking = itemView.findViewById(R.id.btnCancelBooking);
         }
     }
