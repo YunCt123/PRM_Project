@@ -11,10 +11,16 @@ public class Booking {
     private String totalPrice;
     private String statusText;
     private String status; // ACTIVE, COMPLETED, CANCELLED
+    private long rentalEstimated;
+    private long serviceFee;
+    private long insuranceFee;
+    private String rentalDays;
+    private String checkoutUrl;
 
     public Booking(String bookingId, String vehicleName, String vehicleImageUrl,
                    String pickupDate, String pickupTime, String returnDate,
-                   String returnTime, String totalPrice, String statusText, String status) {
+                   String returnTime, String totalPrice, String statusText, String status,
+                   long rentalEstimated, long serviceFee, long insuranceFee, String rentalDays, String checkoutUrl) {
         this.bookingId = bookingId;
         this.vehicleName = vehicleName;
         this.vehicleImageUrl = vehicleImageUrl;
@@ -25,6 +31,11 @@ public class Booking {
         this.totalPrice = totalPrice;
         this.statusText = statusText;
         this.status = status;
+        this.rentalEstimated = rentalEstimated;
+        this.serviceFee = serviceFee;
+        this.insuranceFee = insuranceFee;
+        this.rentalDays = rentalDays;
+        this.checkoutUrl = checkoutUrl;
     }
 
     // Getters
@@ -66,6 +77,26 @@ public class Booking {
 
     public String getStatus() {
         return status;
+    }
+
+    public long getRentalEstimated() {
+        return rentalEstimated;
+    }
+
+    public long getServiceFee() {
+        return serviceFee;
+    }
+
+    public long getInsuranceFee() {
+        return insuranceFee;
+    }
+
+    public String getRentalDays() {
+        return rentalDays;
+    }
+
+    public String getCheckoutUrl() {
+        return checkoutUrl;
     }
 
     // Setters

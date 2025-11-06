@@ -442,12 +442,11 @@ public class PaymentActivity extends AppCompatActivity {
             Log.e("PaymentActivity", "Error parsing dates", e);
         }
 
-        // Create deposit - set minimum amount as per API requirement
-        long depositAmount = 250000000L; // Minimum deposit 250000000 VND
-        Booking.Deposit deposit = new Booking.Deposit(depositAmount, "VND", "payos", "PAYOS" + System.currentTimeMillis());
-        Log.d("PaymentActivity", "Deposit - amount: " + depositAmount + ", currency: VND, provider: payos, ref: " + deposit.getProviderRef());
+        // Create deposit with only provider
+        Booking.Deposit deposit = new Booking.Deposit("payos");
+        Log.d("PaymentActivity", "Deposit - provider: payos");
 
-        // Create booking
+        // Create booking with deposit
         Booking booking = new Booking(vehicleId, startTime, endTime, deposit);
 
         // Call API to create booking
@@ -488,7 +487,10 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void displayQRCode(String qrCode, String checkoutUrl) {
-        // For now, open checkout URL in browser
+        // Show message that QR is ready
+        Toast.makeText(this, "Mã QR đã sẵn sàng. Đang mở trang thanh toán...", Toast.LENGTH_SHORT).show();
+
+        // Immediately open the checkout URL from API response
         try {
             android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
             intent.setData(android.net.Uri.parse(checkoutUrl));
@@ -548,12 +550,11 @@ public class PaymentActivity extends AppCompatActivity {
             Log.e("PaymentActivity", "Error parsing dates", e);
         }
 
-        // Create deposit - set minimum amount as per API requirement
-        long depositAmount = 250000000L; // Minimum deposit 250000000 VND
-        Booking.Deposit deposit = new Booking.Deposit(depositAmount, "VND", "payos", "PAYOS" + System.currentTimeMillis());
-        Log.d("PaymentActivity", "Deposit - amount: " + depositAmount + ", currency: VND, provider: payos, ref: " + deposit.getProviderRef());
+        // Create deposit with only provider
+        Booking.Deposit deposit = new Booking.Deposit("payos");
+        Log.d("PaymentActivity", "Deposit - provider: payos");
 
-        // Create booking
+        // Create booking with deposit
         Booking booking = new Booking(vehicleId, startTime, endTime, deposit);
 
         // Call API to create booking

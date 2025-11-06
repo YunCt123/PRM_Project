@@ -1,6 +1,9 @@
 package com.example.prm_project.ui.booking;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -9,8 +12,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_project.R;
+import com.example.prm_project.repository.BookingRespository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.text.SimpleDateFormat;
 
 public class BookingDetailsActivity extends AppCompatActivity {
 
@@ -23,20 +29,26 @@ public class BookingDetailsActivity extends AppCompatActivity {
     private TextView tvPickupTime;
     private TextView tvReturnDate;
     private TextView tvReturnTime;
+    private TextView tvDeposit;
+    private TextView tvRentalPriceLabel;
     private TextView tvDailyRate;
-    private TextView tvServiceFee;
-    private TextView tvInsurance;
+    private TextView tvTax;
     private TextView tvTotalPrice;
     private MaterialButton btnContactSupport;
+    private MaterialButton btnPayment;
     private MaterialButton btnCancelBooking;
 
     private String bookingId;
     private String status;
+    private String checkoutUrl;
+    private BookingRespository bookingRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_details);
+
+        bookingRepository = new BookingRespository(this);
 
         initViews();
         loadBookingData();
@@ -53,65 +65,126 @@ public class BookingDetailsActivity extends AppCompatActivity {
         tvPickupTime = findViewById(R.id.tvPickupTime);
         tvReturnDate = findViewById(R.id.tvReturnDate);
         tvReturnTime = findViewById(R.id.tvReturnTime);
+        tvDeposit = findViewById(R.id.tvDeposit);
+        tvRentalPriceLabel = findViewById(R.id.tvRentalPriceLabel);
         tvDailyRate = findViewById(R.id.tvDailyRate);
-        tvServiceFee = findViewById(R.id.tvServiceFee);
-        tvInsurance = findViewById(R.id.tvInsurance);
+        tvTax = findViewById(R.id.tvTax);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnContactSupport = findViewById(R.id.btnContactSupport);
+        btnPayment = findViewById(R.id.btnPayment);
         btnCancelBooking = findViewById(R.id.btnCancelBooking);
     }
 
     private void loadBookingData() {
-        // Get data from intent
+        // Get booking ID from intent
         bookingId = getIntent().getStringExtra("BOOKING_ID");
-        String vehicleName = getIntent().getStringExtra("VEHICLE_NAME");
-        String pickupDate = getIntent().getStringExtra("PICKUP_DATE");
-        String pickupTime = getIntent().getStringExtra("PICKUP_TIME");
-        String returnDate = getIntent().getStringExtra("RETURN_DATE");
-        String returnTime = getIntent().getStringExtra("RETURN_TIME");
-        String totalPrice = getIntent().getStringExtra("TOTAL_PRICE");
-        status = getIntent().getStringExtra("STATUS");
-        String statusText = getIntent().getStringExtra("STATUS_TEXT");
 
-        // Set data to views
-        if (bookingId != null) tvBookingId.setText("#" + bookingId);
-        if (vehicleName != null) tvVehicleName.setText(vehicleName);
-        if (pickupDate != null) tvPickupDate.setText(pickupDate);
-        if (pickupTime != null) tvPickupTime.setText(pickupTime);
-        if (returnDate != null) tvReturnDate.setText(returnDate);
-        if (returnTime != null) tvReturnTime.setText(returnTime);
-        if (totalPrice != null) tvTotalPrice.setText(totalPrice);
-        if (statusText != null) tvBookingStatus.setText(statusText);
-
-        // Set status color
-        if ("ACTIVE".equals(status)) {
-            tvBookingStatus.setTextColor(getResources().getColor(R.color.primary_blue));
-            btnCancelBooking.setVisibility(View.VISIBLE);
-        } else if ("COMPLETED".equals(status)) {
-            tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-            btnCancelBooking.setVisibility(View.GONE);
-        } else if ("CANCELLED".equals(status)) {
-            tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            btnCancelBooking.setVisibility(View.GONE);
+        if (bookingId == null) {
+            Toast.makeText(this, "Không tìm thấy mã đặt xe", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        // Set vehicle type (dummy data)
-        tvVehicleType.setText("Sedan • Electric • 2023");
-        
-        // Calculate price breakdown (dummy calculation)
-        if (totalPrice != null) {
-            try {
-                int total = Integer.parseInt(totalPrice.replace("$", ""));
-                int insurance = 20;
-                int serviceFee = 20;
-                int dailyRate = total - insurance - serviceFee;
-                
-                tvDailyRate.setText("$" + dailyRate);
-                tvServiceFee.setText("$" + serviceFee);
-                tvInsurance.setText("$" + insurance);
-            } catch (Exception e) {
-                e.printStackTrace();
+        // Fetch booking details from API
+        bookingRepository.getBookingDetails(bookingId).observe(this, bookingItem -> {
+            if (bookingItem != null) {
+                populateBookingData(bookingItem);
+            } else {
+                Toast.makeText(this, "Không thể tải chi tiết đặt xe", Toast.LENGTH_SHORT).show();
+                finish();
             }
+        });
+    }
+
+    private void populateBookingData(com.example.prm_project.models.Booking.BookingItem bookingItem) {
+        try {
+            // Set booking ID
+            tvBookingId.setText("#" + bookingItem.getId());
+
+            // Set vehicle information
+            if (bookingItem.getVehicle() != null) {
+                String vehicleName = bookingItem.getVehicle().getBrand() + " " + bookingItem.getVehicle().getModel();
+                tvVehicleName.setText(vehicleName);
+                tvVehicleType.setText("Biển số: " + bookingItem.getVehicle().getPlateNumber());
+            }
+
+            // Set station information
+            if (bookingItem.getStation() != null) {
+                // Could add station name display if needed
+            }
+
+            // Parse and set dates
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
+            isoFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
+
+            if (bookingItem.getStartTime() != null) {
+                java.util.Date startDate = isoFormat.parse(bookingItem.getStartTime());
+                tvPickupDate.setText(dateFormat.format(startDate));
+                tvPickupTime.setText(timeFormat.format(startDate));
+            }
+
+            if (bookingItem.getEndTime() != null) {
+                java.util.Date endDate = isoFormat.parse(bookingItem.getEndTime());
+                tvReturnDate.setText(dateFormat.format(endDate));
+                tvReturnTime.setText(timeFormat.format(endDate));
+            }
+
+            // Set status
+            status = bookingItem.getStatus();
+            String statusText = getStatusText(status);
+            tvBookingStatus.setText(statusText);
+
+            // Store checkout URL
+            if (bookingItem.getDeposit() != null) {
+                checkoutUrl = bookingItem.getDeposit().getCheckoutUrl();
+            }
+
+            // Set status color and button visibility
+            if ("active".equals(status)) {
+                tvBookingStatus.setTextColor(getResources().getColor(R.color.primary_blue, getTheme()));
+                btnCancelBooking.setVisibility(View.VISIBLE);
+            } else if ("completed".equals(status)) {
+                tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark, getTheme()));
+                btnCancelBooking.setVisibility(View.GONE);
+            } else if ("cancelled".equals(status)) {
+                tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark, getTheme()));
+                btnCancelBooking.setVisibility(View.GONE);
+            } else if ("expired".equals(status)) {
+                tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark, getTheme()));
+                btnCancelBooking.setVisibility(View.GONE);
+            }
+
+            // Show payment button if checkout URL exists
+            btnPayment.setVisibility(checkoutUrl != null && !checkoutUrl.isEmpty() ? View.VISIBLE : View.GONE);
+
+            // Set price breakdown using amounts data
+            if (bookingItem.getAmounts() != null) {
+                long rentalEstimated = bookingItem.getAmounts().getRentalEstimated();
+                tvDailyRate.setText(formatCurrency(rentalEstimated));
+
+                // Deposit = grandTotal - rentalEstimated
+                long depositAmount = bookingItem.getAmounts().getGrandTotal() - rentalEstimated;
+                tvDeposit.setText(formatCurrency(depositAmount));
+
+                // Tax
+                tvTax.setText(formatCurrency(bookingItem.getAmounts().getTax()));
+
+                // Set total price from grandTotal
+                tvTotalPrice.setText(formatCurrency(bookingItem.getAmounts().getGrandTotal()));
+
+                // Update rental price label with days from pricing snapshot
+                if (bookingItem.getPricingSnapshot() != null) {
+                    int days = bookingItem.getPricingSnapshot().getDays();
+                    tvRentalPriceLabel.setText("Giá thuê (" + days + " ngày)");
+                }
+            }
+
+        } catch (Exception e) {
+            Log.e("BookingDetailsActivity", "Error parsing booking data", e);
+            Toast.makeText(this, "Lỗi khi xử lý dữ liệu đặt xe", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -123,7 +196,40 @@ public class BookingDetailsActivity extends AppCompatActivity {
             // TODO: Open support chat or call
         });
 
+        btnPayment.setOnClickListener(v -> {
+            if (checkoutUrl != null && !checkoutUrl.isEmpty()) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl));
+                startActivity(browserIntent);
+            } else {
+                Toast.makeText(this, "Không tìm thấy liên kết thanh toán", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         btnCancelBooking.setOnClickListener(v -> showCancelDialog());
+    }
+
+    private String getStatusText(String status) {
+        if (status == null) return "Không xác định";
+        switch (status.toLowerCase()) {
+            case "pending":
+                return "Chờ xác nhận";
+            case "active":
+                return "Đang hoạt động";
+            case "completed":
+                return "Đã hoàn thành";
+            case "cancelled":
+                return "Đã hủy";
+            case "expired":
+                return "Đã hết hạn";
+            default:
+                return "Không xác định";
+        }
+    }
+
+    private String formatCurrency(long amount) {
+        // Format amount as VND currency
+        java.text.NumberFormat formatter = java.text.NumberFormat.getInstance(java.util.Locale.getDefault());
+        return formatter.format(amount) + " VND";
     }
 
     private void showCancelDialog() {
