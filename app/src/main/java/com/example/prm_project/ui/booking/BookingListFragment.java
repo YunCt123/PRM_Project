@@ -1,7 +1,6 @@
 package com.example.prm_project.ui.booking;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +25,8 @@ public class BookingListFragment extends Fragment {
     private static final String ARG_STATUS = "status";
     private String bookingStatus;
     private FragmentBookingListBinding binding;
-    private BookingAdapter bookingAdapter;
-    private List<Booking> bookingList;
+    private BookingApiAdapter bookingAdapter;
+    private List<com.example.prm_project.models.Booking.BookingItem> bookingList;
     private BookingRepository bookingRepository;
 
     public static BookingListFragment newInstance(String status) {
@@ -64,7 +63,12 @@ public class BookingListFragment extends Fragment {
 
     private void setupRecyclerView() {
         bookingList = new ArrayList<>();
-        bookingAdapter = new BookingAdapter(bookingList, getContext());
+        bookingAdapter = new BookingApiAdapter(bookingList, getContext());
+        
+        // Set action listener for cancel booking
+        bookingAdapter.setActionListener(bookingId -> {
+            cancelBooking(bookingId);
+        });
         
         binding.recyclerViewBookings.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewBookings.setAdapter(bookingAdapter);
@@ -73,27 +77,36 @@ public class BookingListFragment extends Fragment {
     private void loadBookings() {
         bookingList.clear();
 
-        // Map status to API parameter
-        String apiStatus = "";
-        if ("PENDING".equals(bookingStatus)) {
-            apiStatus = "pending";
-        } else if ("ACTIVE".equals(bookingStatus)) {
-            apiStatus = "active";
-        } else if ("COMPLETED".equals(bookingStatus)) {
-            apiStatus = "completed";
-        } else if ("CANCELLED".equals(bookingStatus)) {
-            apiStatus = "cancelled";
-        } else if ("EXPIRED".equals(bookingStatus)) {
-            apiStatus = "expired";
+        // For "Đang hoạt động" tab, we need to show both reserved and active
+        // Since API doesn't support multiple statuses, we'll load all and filter
+        if (bookingStatus != null && bookingStatus.contains(",")) {
+            // Load all bookings without status filter, then filter on client
+            loadAllAndFilter();
+        } else {
+            // Single status - use API filter
+            loadBookingsByStatus(bookingStatus);
         }
+    }
 
-        // Load bookings from API
-        bookingRepository.getMyBookings(1, 20, apiStatus).observe(getViewLifecycleOwner(), response -> {
+    private void loadAllAndFilter() {
+        // Load without status filter
+        bookingRepository.getMyBookings(1, 100, "").observe(getViewLifecycleOwner(), response -> {
             if (response != null && response.isSuccess() && response.getItems() != null) {
+                // Get allowed statuses
+                String[] allowedStatuses = bookingStatus.split(",");
+                
                 for (com.example.prm_project.models.Booking.BookingItem item : response.getItems()) {
-                    com.example.prm_project.ui.booking.Booking uiBooking = convertApiBookingToUiBooking(item);
-                    if (uiBooking != null) {
-                        bookingList.add(uiBooking);
+                    // Check if item status matches any allowed status
+                    boolean isAllowed = false;
+                    for (String status : allowedStatuses) {
+                        if (status.trim().equalsIgnoreCase(item.getStatus())) {
+                            isAllowed = true;
+                            break;
+                        }
+                    }
+                    
+                    if (isAllowed) {
+                        bookingList.add(item);
                     }
                 }
             }
@@ -110,95 +123,52 @@ public class BookingListFragment extends Fragment {
         });
     }
 
-    private com.example.prm_project.ui.booking.Booking convertApiBookingToUiBooking(com.example.prm_project.models.Booking.BookingItem apiBooking) {
-        try {
-            // Parse startTime and endTime
-            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-            isoFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-
-            Date startDate = isoFormat.parse(apiBooking.getStartTime());
-            Date endDate = isoFormat.parse(apiBooking.getEndTime());
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-            String pickupDate = dateFormat.format(startDate);
-            String pickupTime = timeFormat.format(startDate);
-            String returnDate = dateFormat.format(endDate);
-            String returnTime = timeFormat.format(endDate);
-
-            // Vehicle info (hardcoded as requested)
-            String vehicleId = apiBooking.getVehicle() != null ? apiBooking.getVehicle().getId() : "N/A";
-            String vehicleName = apiBooking.getVehicle() != null ?
-                apiBooking.getVehicle().getBrand() + " " + apiBooking.getVehicle().getModel() : "Unknown Vehicle";
-            String vehicleImageUrl = "https://example.com/vehicle.jpg"; // Hardcoded as requested
-
-            // Total price from deposit amount
-            String totalPrice = apiBooking.getDeposit() != null ?
-                String.valueOf(apiBooking.getDeposit().getAmount()) + " VND" : "0 VND";
-
-            // Status text
-            String statusText = getStatusText(apiBooking.getStatus());
-            String status = apiBooking.getStatus().toUpperCase();
-
-            // Get amounts data
-            long rentalEstimated = 0;
-            long serviceFee = 0;
-            long insuranceFee = 0;
-            if (apiBooking.getAmounts() != null) {
-                rentalEstimated = apiBooking.getAmounts().getRentalEstimated();
-                // Service fee and insurance can be hardcoded as mentioned
-                serviceFee = 20000; // 20,000 VND
-                insuranceFee = 20000; // 20,000 VND
-            }
-
-            // Calculate rental days (simplified calculation)
-            String rentalDays = "4"; // Default, could be calculated from dates
-
-            // Get checkout URL from deposit
-            String checkoutUrl = "";
-            if (apiBooking.getDeposit() != null) {
-                checkoutUrl = apiBooking.getDeposit().getCheckoutUrl();
-            }
-
-            return new com.example.prm_project.ui.booking.Booking(
-                apiBooking.getId(),
-                vehicleName,
-                vehicleImageUrl,
-                pickupDate,
-                pickupTime,
-                returnDate,
-                returnTime,
-                totalPrice,
-                statusText,
-                status,
-                rentalEstimated,
-                serviceFee,
-                insuranceFee,
-                rentalDays,
-                checkoutUrl
-            );
-        } catch (Exception e) {
-            Log.e("BookingListFragment", "Error parsing booking dates", e);
-            return null;
+    private void loadBookingsByStatus(String status) {
+        // Map status to API parameter
+        String apiStatus = "";
+        if ("PENDING".equals(status)) {
+            apiStatus = "pending";
+        } else if ("RESERVED".equals(status)) {
+            apiStatus = "reserved";
+        } else if ("ACTIVE".equals(status)) {
+            apiStatus = "active";
+        } else if ("COMPLETED".equals(status)) {
+            apiStatus = "completed";
+        } else if ("CANCELLED".equals(status)) {
+            apiStatus = "cancelled";
+        } else if ("EXPIRED".equals(status)) {
+            apiStatus = "expired";
         }
+
+        // Load bookings from API
+        bookingRepository.getMyBookings(1, 20, apiStatus).observe(getViewLifecycleOwner(), response -> {
+            if (response != null && response.isSuccess() && response.getItems() != null) {
+                bookingList.addAll(response.getItems());
+            }
+
+            // Show/hide empty state
+            if (bookingList.isEmpty()) {
+                binding.recyclerViewBookings.setVisibility(View.GONE);
+                binding.emptyStateLayout.setVisibility(View.VISIBLE);
+            } else {
+                binding.recyclerViewBookings.setVisibility(View.VISIBLE);
+                binding.emptyStateLayout.setVisibility(View.GONE);
+                bookingAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
-    private String getStatusText(String status) {
-        switch (status.toLowerCase()) {
-            case "pending":
-                return "Chờ xác nhận";
-            case "active":
-                return "Đang hoạt động";
-            case "completed":
-                return "Đã hoàn thành";
-            case "cancelled":
-                return "Đã hủy";
-            case "expired":
-                return "Đã hết hạn";
-            default:
-                return "Không xác định";
-        }
+    /**
+     * Cancel a booking
+     */
+    private void cancelBooking(String bookingId) {
+        bookingRepository.cancelBooking(bookingId).observe(getViewLifecycleOwner(), cancelledBooking -> {
+            if (cancelledBooking != null) {
+                // Success - reload bookings
+                loadBookings();
+            }
+            // Error toast is already shown in repository
+        });
     }
 
     @Override

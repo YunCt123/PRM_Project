@@ -65,6 +65,21 @@
             android:label="Thanh toán"
             android:parentActivityName=".activies.MainActivity" />
 
+        <!-- Booking Result Activity - handles PayOS payment callbacks -->
+        <activity
+            android:name=".activies.BookingResultActivity"
+            android:exported="true"
+            android:label="Kết quả đặt xe"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- PayOS callback URL scheme -->
+                <data android:scheme="evrentalapp" android:host="payment" />
+            </intent-filter>
+        </activity>
+
         <!-- Verify Account Activity -->
         <activity
             android:name=".activies.VerifyAccountActivity"

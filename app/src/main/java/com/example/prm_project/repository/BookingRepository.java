@@ -40,16 +40,6 @@ public class BookingRepository {
         // Create BookingRequest with deposit provider
         BookingRequest bookingRequest = new BookingRequest(vehicleId, startTime, endTime, "payos");
 
-        // Debug log the booking request
-        Log.d(TAG, "Creating booking - vehicleId: " + vehicleId);
-        Log.d(TAG, "Creating booking - startTime: " + startTime);
-        Log.d(TAG, "Creating booking - endTime: " + endTime);
-        Log.d(TAG, "Creating booking - deposit provider: payos");
-
-        // Log the full JSON request body
-        String jsonBody = gson.toJson(bookingRequest);
-        Log.d(TAG, "Booking request JSON: " + jsonBody);
-
         // Get Bearer token
         String token = sessionManager.getToken();
         String authHeader = "Bearer " + token;
@@ -57,19 +47,12 @@ public class BookingRepository {
         bookingApiService.createBooking(authHeader, bookingRequest).enqueue(new Callback<BookingResponse>() {
             @Override
             public void onResponse(Call<BookingResponse> call, Response<BookingResponse> response) {
-                Log.d(TAG, "Response received - Code: " + response.code() + ", Message: " + response.message());
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Booking created successfully: " + response.body());
                     data.setValue(response.body());
                 } else {
-                    Log.e(TAG,
-                            "Booking creation failed - Code: " + response.code() + ", Message: " + response.message());
-                    Log.e(TAG, "Request headers: " + call.request().headers());
                     try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string()
-                                : "No error body";
-                        Log.e(TAG, "Error Body: " + errorBody);
-
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        
                         // Parse error message and show toast
                         try {
                             JSONObject json = new JSONObject(errorBody);
@@ -79,7 +62,6 @@ public class BookingRepository {
                             Toast.makeText(context, "Tạo thông tin đặt xe thất bại", Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "Error reading error body", e);
                         Toast.makeText(context, "Booking creation failed", Toast.LENGTH_LONG).show();
                     }
                     data.setValue(null);
@@ -88,9 +70,6 @@ public class BookingRepository {
 
             @Override
             public void onFailure(Call<BookingResponse> call, Throwable t) {
-                Log.e(TAG, "Booking creation network failure", t);
-                Log.e(TAG, "Request URL: " + call.request().url());
-                Log.e(TAG, "Request method: " + call.request().method());
                 Toast.makeText(context, "Lỗi mạng khi tạo booking", Toast.LENGTH_SHORT).show();
                 data.setValue(null);
             }
@@ -101,20 +80,29 @@ public class BookingRepository {
     public LiveData<Booking.BookingListResponse> getMyBookings(int page, int limit, String status) {
         MutableLiveData<Booking.BookingListResponse> data = new MutableLiveData<>();
 
-        Log.d(TAG, "Getting my bookings - page: " + page + ", limit: " + limit + ", status: " + status);
+        // Get Bearer token
+        String token = sessionManager.getToken();
+        String authHeader = "Bearer " + token;
 
-        bookingApiService.getMyBookings(page, limit, status).enqueue(new Callback<Booking.BookingListResponse>() {
+        Log.d(TAG, "getMyBookings - page: " + page + ", limit: " + limit + ", status: '" + status + "'");
+        Log.d(TAG, "Token: " + (token != null ? "exists" : "null"));
+
+        bookingApiService.getMyBookings(authHeader, page, limit, status).enqueue(new Callback<Booking.BookingListResponse>() {
             @Override
             public void onResponse(Call<Booking.BookingListResponse> call, Response<Booking.BookingListResponse> response) {
-                Log.d(TAG, "Response received - Code: " + response.code() + ", Message: " + response.message());
+                Log.d(TAG, "Response code: " + response.code());
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Bookings retrieved successfully");
+                    Booking.BookingListResponse body = response.body();
+                    if (body != null) {
+                        Log.d(TAG, "Success! Items: " + (body.getItems() != null ? body.getItems().size() : 0));
+                        Log.d(TAG, "Total: " + body.getTotal() + ", Page: " + body.getPage());
+                    }
                     data.setValue(response.body());
                 } else {
-                    Log.e(TAG, "Failed to get bookings - Code: " + response.code() + ", Message: " + response.message());
+                    Log.e(TAG, "Error response: " + response.code());
                     try {
                         String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
-                        Log.e(TAG, "Error Body: " + errorBody);
+                        Log.e(TAG, "Error body: " + errorBody);
                         Toast.makeText(context, "Không thể tải danh sách đặt xe", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         Log.e(TAG, "Error reading error body", e);
@@ -125,7 +113,7 @@ public class BookingRepository {
 
             @Override
             public void onFailure(Call<Booking.BookingListResponse> call, Throwable t) {
-                Log.e(TAG, "Network failure getting bookings", t);
+                Log.e(TAG, "Network failure", t);
                 Toast.makeText(context, "Lỗi mạng khi tải danh sách đặt xe", Toast.LENGTH_SHORT).show();
                 data.setValue(null);
             }
@@ -137,23 +125,21 @@ public class BookingRepository {
     public LiveData<Booking.BookingItem> getBookingDetails(String bookingId) {
         MutableLiveData<Booking.BookingItem> data = new MutableLiveData<>();
 
-        Log.d(TAG, "Getting booking details for ID: " + bookingId);
+        // Get Bearer token
+        String token = sessionManager.getToken();
+        String authHeader = "Bearer " + token;
 
-        bookingApiService.getBookingDetails(bookingId).enqueue(new Callback<Booking.BookingItem>() {
+        bookingApiService.getBookingDetails(authHeader, bookingId).enqueue(new Callback<Booking.BookingItem>() {
             @Override
             public void onResponse(Call<Booking.BookingItem> call, Response<Booking.BookingItem> response) {
-                Log.d(TAG, "Response received - Code: " + response.code() + ", Message: " + response.message());
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "Booking details retrieved successfully");
                     data.setValue(response.body());
                 } else {
-                    Log.e(TAG, "Failed to get booking details - Code: " + response.code() + ", Message: " + response.message());
                     try {
                         String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
-                        Log.e(TAG, "Error Body: " + errorBody);
                         Toast.makeText(context, "Không thể tải chi tiết đặt xe", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        Log.e(TAG, "Error reading error body", e);
+                        // Silent catch
                     }
                     data.setValue(null);
                 }
@@ -161,8 +147,60 @@ public class BookingRepository {
 
             @Override
             public void onFailure(Call<Booking.BookingItem> call, Throwable t) {
-                Log.e(TAG, "Network failure getting booking details", t);
                 Toast.makeText(context, "Lỗi mạng khi tải chi tiết đặt xe", Toast.LENGTH_SHORT).show();
+                data.setValue(null);
+            }
+        });
+
+        return data;
+    }
+
+    /**
+     * Hủy booking
+     * @param bookingId ID của booking cần hủy
+     * @return LiveData chứa booking đã hủy hoặc null nếu lỗi
+     */
+    public LiveData<Booking.BookingItem> cancelBooking(String bookingId) {
+        MutableLiveData<Booking.BookingItem> data = new MutableLiveData<>();
+
+        // Get Bearer token
+        String token = sessionManager.getToken();
+        String authHeader = "Bearer " + token;
+
+        Log.d(TAG, "Canceling booking: " + bookingId);
+
+        bookingApiService.cancelBooking(authHeader, bookingId).enqueue(new Callback<Booking.BookingItem>() {
+            @Override
+            public void onResponse(Call<Booking.BookingItem> call, Response<Booking.BookingItem> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Booking cancelled successfully");
+                    Toast.makeText(context, "Đã hủy đơn đặt xe thành công", Toast.LENGTH_SHORT).show();
+                    data.setValue(response.body());
+                } else {
+                    Log.e(TAG, "Cancel booking failed: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e(TAG, "Error body: " + errorBody);
+                        
+                        // Parse error message
+                        try {
+                            JSONObject json = new JSONObject(errorBody);
+                            String message = json.optString("message", "Không thể hủy đơn đặt xe");
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                        } catch (Exception parseException) {
+                            Toast.makeText(context, "Không thể hủy đơn đặt xe", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(context, "Không thể hủy đơn đặt xe", Toast.LENGTH_SHORT).show();
+                    }
+                    data.setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Booking.BookingItem> call, Throwable t) {
+                Log.e(TAG, "Network failure when canceling booking", t);
+                Toast.makeText(context, "Lỗi mạng khi hủy đơn đặt xe", Toast.LENGTH_SHORT).show();
                 data.setValue(null);
             }
         });

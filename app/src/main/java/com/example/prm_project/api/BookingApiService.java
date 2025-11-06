@@ -27,8 +27,29 @@ public interface BookingApiService {
     );
 
     @GET("api/bookings/mine")
-    Call<Booking.BookingListResponse> getMyBookings(@Query("page") int page, @Query("limit") int limit, @Query("status") String status);
+    Call<Booking.BookingListResponse> getMyBookings(
+            @Header("Authorization") String authorization,
+            @Query("page") int page, 
+            @Query("limit") int limit, 
+            @Query("status") String status
+    );
 
     @GET("api/bookings/{id}")
-    Call<Booking.BookingItem> getBookingDetails(@Path("id") String bookingId);
+    Call<Booking.BookingItem> getBookingDetails(
+            @Header("Authorization") String authorization,
+            @Path("id") String bookingId
+    );
+
+    /**
+     * Hủy booking (pending/reserved -> cancelled)
+     * POST /api/bookings/{id}/cancel
+     * @param authorization Bearer token
+     * @param bookingId ID của booking cần hủy
+     * @return Booking data sau khi hủy
+     */
+    @POST("api/bookings/{id}/cancel")
+    Call<Booking.BookingItem> cancelBooking(
+            @Header("Authorization") String authorization,
+            @Path("id") String bookingId
+    );
 }

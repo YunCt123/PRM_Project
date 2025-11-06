@@ -7,12 +7,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.PaymentActivity;
+import com.example.prm_project.activies.VerifyAccountActivity;
 import com.example.prm_project.ui.home.Vehicle;
+import com.example.prm_project.utils.SessionManager;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -24,11 +27,15 @@ public class DetailActivity extends AppCompatActivity {
     private String vehicleId;
     private double pricePerDay;
     private double pricePerHour;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        // Initialize SessionManager
+        sessionManager = new SessionManager(this);
 
         // Hide action bar
         if (getSupportActionBar() != null) {
@@ -120,7 +127,13 @@ public class DetailActivity extends AppCompatActivity {
 
         // Set click listeners
         btnBookNow.setOnClickListener(v -> {
-            // Navigate to PaymentActivity
+            // Check if user is verified before allowing booking
+            if (!sessionManager.isVerified()) {
+                showVerificationRequiredDialog();
+                return;
+            }
+            
+            // User is verified, proceed to payment
             Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
             
             // Pass vehicle ID
@@ -143,7 +156,33 @@ public class DetailActivity extends AppCompatActivity {
             finish(); // Close this activity and return to previous screen
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload session data in case user just verified their account
+        // SessionManager will automatically get updated data from SharedPreferences
+    }
     
+    /**
+     * Show dialog when user is not verified
+     */
+    private void showVerificationRequiredDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Yêu cầu xác minh tài khoản")
+                .setMessage("Bạn cần xác minh tài khoản trước khi có thể đặt xe. Vui lòng hoàn tất việc xác minh để tiếp tục.")
+                .setPositiveButton("Xác minh ngay", (dialog, which) -> {
+                    // Navigate to VerifyAccountActivity
+                    Intent verifyIntent = new Intent(DetailActivity.this, VerifyAccountActivity.class);
+                    startActivity(verifyIntent);
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
+    }
+
     /**
      * Format price to Vietnamese format
      */

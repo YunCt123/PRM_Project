@@ -3,6 +3,13 @@ package com.example.prm_project.api;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.BookingVehicleDefaultPhotosDeserializer;
+import com.example.prm_project.models.DefaultPhotosDeserializer;
+import com.example.prm_project.models.ImageObject;
+import com.example.prm_project.models.ImageObjectDeserializer;
+import com.example.prm_project.models.Vehicle;
+import com.example.prm_project.utils.SessionManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -74,9 +81,12 @@ public class ApiClient {
                     .writeTimeout(120, TimeUnit.SECONDS)
                     .build();
 
-            // Gson configuration
+            // Gson configuration with custom deserializer for ImageObject
             Gson gson = new GsonBuilder()
                     .setLenient()
+                    .registerTypeAdapter(ImageObject.class, new ImageObjectDeserializer())
+                    .registerTypeAdapter(Vehicle.DefaultPhotos.class, new DefaultPhotosDeserializer())
+                    .registerTypeAdapter(Booking.Vehicle.DefaultPhotos.class, new BookingVehicleDefaultPhotosDeserializer())
                     .create();
 
             retrofit = new Retrofit.Builder()
@@ -112,9 +122,12 @@ public class ApiClient {
                     })
                     .build();
 
-            // Gson configuration
+            // Gson configuration with custom deserializer for ImageObject
             Gson gson = new GsonBuilder()
                     .setLenient()
+                    .registerTypeAdapter(ImageObject.class, new ImageObjectDeserializer())
+                    .registerTypeAdapter(Vehicle.DefaultPhotos.class, new DefaultPhotosDeserializer())
+                    .registerTypeAdapter(Booking.Vehicle.DefaultPhotos.class, new BookingVehicleDefaultPhotosDeserializer())
                     .create();
 
             authenticatedRetrofit = new Retrofit.Builder()

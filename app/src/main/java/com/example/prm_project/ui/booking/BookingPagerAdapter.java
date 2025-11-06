@@ -19,19 +19,20 @@ public class BookingPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3; // Three tabs: Active, Completed, Cancelled
+        return 3; // Three tabs
     }
 
     private String getBookingStatus(int position) {
         switch (position) {
             case 0:
-                return "ACTIVE";
+                // "Đang hoạt động" includes both reserved and active
+                return "RESERVED,ACTIVE";
             case 1:
                 return "COMPLETED";
             case 2:
                 return "CANCELLED";
             default:
-                return "ACTIVE";
+                return "RESERVED,ACTIVE";
         }
     }
 }

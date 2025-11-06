@@ -367,22 +367,24 @@ public class PaymentActivity extends AppCompatActivity {
                     "Đã tạo booking! Chuyển đến trang thanh toán PayOS...", 
                     Toast.LENGTH_LONG).show();
                 
+                // Save booking data to SharedPreferences for later retrieval
+                sessionManager.saveBookingData(
+                    response.getBookingId(),
+                    vehicleId,
+                    vehicleName,
+                    startTimeStr,
+                    endTimeStr,
+                    response.getAmountEstimated(),
+                    response.getDeposit() != null ? response.getDeposit().getAmount() : 0
+                );
+                
                 // Open PayOS checkout URL in browser
                 if (response.getCheckoutUrl() != null && !response.getCheckoutUrl().isEmpty()) {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(response.getCheckoutUrl()));
                     startActivity(browserIntent);
                     
-                    // Set result and finish
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("booking_id", response.getBookingId());
-                    resultIntent.putExtra("payment_method", "PayOS");
-                    resultIntent.putExtra("amount", response.getAmountEstimated());
-                    resultIntent.putExtra("status", response.getStatus());
-                    resultIntent.putExtra("checkout_url", response.getCheckoutUrl());
-                    setResult(RESULT_OK, resultIntent);
-                    
-                    // Finish activity after a short delay
-                    new android.os.Handler().postDelayed(() -> finish(), 1000);
+                    // Finish this activity - will wait for PayOS callback
+                    finish();
                 } else {
                     Toast.makeText(PaymentActivity.this, "Không thể mở trang thanh toán", Toast.LENGTH_SHORT).show();
                 }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 
 import java.util.List;
@@ -67,8 +68,10 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             holder.btnCancelBooking.setVisibility(View.GONE);
         }
 
-        // Show payment button if checkout URL is available
-        if (booking.getCheckoutUrl() != null && !booking.getCheckoutUrl().isEmpty()) {
+        // Show payment button ONLY for PENDING status
+        if ("PENDING".equals(booking.getStatus()) && 
+            booking.getCheckoutUrl() != null && 
+            !booking.getCheckoutUrl().isEmpty()) {
             holder.btnPayment.setVisibility(View.VISIBLE);
         } else {
             holder.btnPayment.setVisibility(View.GONE);
@@ -96,9 +99,17 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             // TODO: Show confirmation dialog and cancel booking
         });
 
-        // Load vehicle image (using placeholder for now)
-        // TODO: Use Glide or Picasso to load image from URL
-        holder.ivVehicleImage.setImageResource(R.drawable.ic_car);
+        // Load vehicle image using Glide
+        if (booking.getVehicleImageUrl() != null && !booking.getVehicleImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(booking.getVehicleImageUrl())
+                    .placeholder(R.drawable.xe1)
+                    .error(R.drawable.xe1)
+                    .centerCrop()
+                    .into(holder.ivVehicleImage);
+        } else {
+            holder.ivVehicleImage.setImageResource(R.drawable.xe1);
+        }
     }
 
     @Override

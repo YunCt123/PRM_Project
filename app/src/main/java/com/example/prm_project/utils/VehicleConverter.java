@@ -141,7 +141,10 @@ public class VehicleConverter {
             apiVehicle.getDefaultPhotos().getExterior() != null) {
             
             for (Vehicle.Photo photo : apiVehicle.getDefaultPhotos().getExterior()) {
-                urls.add(photo.getUrl());
+                // Only add if url is not null (handles case when only ID is present)
+                if (photo != null && photo.getUrl() != null) {
+                    urls.add(photo.getUrl());
+                }
             }
         }
         return urls;
@@ -157,7 +160,10 @@ public class VehicleConverter {
             apiVehicle.getDefaultPhotos().getInterior() != null) {
             
             for (Vehicle.Photo photo : apiVehicle.getDefaultPhotos().getInterior()) {
-                urls.add(photo.getUrl());
+                // Only add if url is not null (handles case when only ID is present)
+                if (photo != null && photo.getUrl() != null) {
+                    urls.add(photo.getUrl());
+                }
             }
         }
         return urls;

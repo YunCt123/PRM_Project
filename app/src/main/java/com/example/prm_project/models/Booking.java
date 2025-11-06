@@ -475,27 +475,74 @@ public class Booking {
             this.defaultPhotos = defaultPhotos;
         }
 
+        /**
+         * Get main image URL from defaultPhotos exterior array
+         */
+        public String getMainImageUrl() {
+            if (defaultPhotos != null && defaultPhotos.getExterior() != null && !defaultPhotos.getExterior().isEmpty()) {
+                Photo firstPhoto = defaultPhotos.getExterior().get(0);
+                // Return the URL from Photo object
+                return firstPhoto != null ? firstPhoto.getUrl() : null;
+            }
+            return null;
+        }
+
         public static class DefaultPhotos {
             @SerializedName("exterior")
-            private List<String> exterior;
+            private List<Photo> exterior;
 
             @SerializedName("interior")
-            private List<String> interior;
+            private List<Photo> interior;
 
-            public List<String> getExterior() {
+            public List<Photo> getExterior() {
                 return exterior;
             }
 
-            public void setExterior(List<String> exterior) {
+            public void setExterior(List<Photo> exterior) {
                 this.exterior = exterior;
             }
 
-            public List<String> getInterior() {
+            public List<Photo> getInterior() {
                 return interior;
             }
 
-            public void setInterior(List<String> interior) {
+            public void setInterior(List<Photo> interior) {
                 this.interior = interior;
+            }
+        }
+
+        public static class Photo {
+            @SerializedName("_id")
+            private String id;
+
+            @SerializedName("url")
+            private String url;
+
+            @SerializedName("type")
+            private String type;
+
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            public String getType() {
+                return type;
+            }
+
+            public void setType(String type) {
+                this.type = type;
             }
         }
     }

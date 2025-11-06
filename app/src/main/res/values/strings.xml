@@ -73,7 +73,7 @@
 
     <!-- Strings used by fragment_profile.xml (added) -->
     <string name="my_profile">Hồ sơ của tôi</string>
-    <string name="settings">Cài đặt</string>
+    <string name="settings">Chỉnh sửa hồ sơ</string>
     <string name="transaction_history">Lịch sử giao dịch</string>
     <string name="faq">Câu hỏi thường gặp</string>
     <string name="about_app">Về ứng dụng</string>

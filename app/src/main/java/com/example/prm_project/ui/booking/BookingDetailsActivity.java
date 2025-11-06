@@ -3,16 +3,18 @@ package com.example.prm_project.ui.booking;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
 import com.example.prm_project.repository.BookingRepository;
+import com.example.prm_project.repository.VehicleRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 public class BookingDetailsActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
+    private ImageView ivVehicleImage;
     private TextView tvBookingStatus;
     private TextView tvVehicleName;
     private TextView tvVehicleType;
@@ -34,7 +37,6 @@ public class BookingDetailsActivity extends AppCompatActivity {
     private TextView tvDailyRate;
     private TextView tvTax;
     private TextView tvTotalPrice;
-    private MaterialButton btnContactSupport;
     private MaterialButton btnPayment;
     private MaterialButton btnCancelBooking;
 
@@ -42,6 +44,7 @@ public class BookingDetailsActivity extends AppCompatActivity {
     private String status;
     private String checkoutUrl;
     private BookingRepository bookingRepository;
+    private VehicleRepository vehicleRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class BookingDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_booking_details);
 
         bookingRepository = new BookingRepository(this);
+        vehicleRepository = new VehicleRepository();
 
         initViews();
         loadBookingData();
@@ -57,6 +61,7 @@ public class BookingDetailsActivity extends AppCompatActivity {
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
+        ivVehicleImage = findViewById(R.id.ivVehicleImage);
         tvBookingStatus = findViewById(R.id.tvBookingStatus);
         tvVehicleName = findViewById(R.id.tvVehicleName);
         tvVehicleType = findViewById(R.id.tvVehicleType);
@@ -70,7 +75,6 @@ public class BookingDetailsActivity extends AppCompatActivity {
         tvDailyRate = findViewById(R.id.tvDailyRate);
         tvTax = findViewById(R.id.tvTax);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
-        btnContactSupport = findViewById(R.id.btnContactSupport);
         btnPayment = findViewById(R.id.btnPayment);
         btnCancelBooking = findViewById(R.id.btnCancelBooking);
     }
@@ -106,6 +110,9 @@ public class BookingDetailsActivity extends AppCompatActivity {
                 String vehicleName = bookingItem.getVehicle().getBrand() + " " + bookingItem.getVehicle().getModel();
                 tvVehicleName.setText(vehicleName);
                 tvVehicleType.setText("Biển số: " + bookingItem.getVehicle().getPlateNumber());
+                
+                // Load vehicle image
+                loadVehicleImage(bookingItem.getVehicle());
             }
 
             // Set station information
@@ -142,23 +149,33 @@ public class BookingDetailsActivity extends AppCompatActivity {
                 checkoutUrl = bookingItem.getDeposit().getCheckoutUrl();
             }
 
-            // Set status color and button visibility
-            if ("active".equals(status)) {
+            // Set status color and button visibility based on status
+            if ("reserved".equals(status)) {
+                // Reserved = đã thanh toán thành công, ẩn nút thanh toán
+                tvBookingStatus.setTextColor(getResources().getColor(R.color.primary_green, getTheme()));
+                btnPayment.setVisibility(View.GONE);
+                btnCancelBooking.setVisibility(View.VISIBLE);
+            } else if ("active".equals(status)) {
                 tvBookingStatus.setTextColor(getResources().getColor(R.color.primary_blue, getTheme()));
+                btnPayment.setVisibility(checkoutUrl != null && !checkoutUrl.isEmpty() ? View.VISIBLE : View.GONE);
                 btnCancelBooking.setVisibility(View.VISIBLE);
             } else if ("completed".equals(status)) {
                 tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark, getTheme()));
+                btnPayment.setVisibility(View.GONE);
                 btnCancelBooking.setVisibility(View.GONE);
             } else if ("cancelled".equals(status)) {
                 tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark, getTheme()));
+                btnPayment.setVisibility(View.GONE);
                 btnCancelBooking.setVisibility(View.GONE);
             } else if ("expired".equals(status)) {
                 tvBookingStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark, getTheme()));
+                btnPayment.setVisibility(View.GONE);
                 btnCancelBooking.setVisibility(View.GONE);
+            } else {
+                // Default case (pending or other)
+                btnPayment.setVisibility(checkoutUrl != null && !checkoutUrl.isEmpty() ? View.VISIBLE : View.GONE);
+                btnCancelBooking.setVisibility(View.VISIBLE);
             }
-
-            // Show payment button if checkout URL exists
-            btnPayment.setVisibility(checkoutUrl != null && !checkoutUrl.isEmpty() ? View.VISIBLE : View.GONE);
 
             // Set price breakdown using amounts data
             if (bookingItem.getAmounts() != null) {
@@ -183,18 +200,13 @@ public class BookingDetailsActivity extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            Log.e("BookingDetailsActivity", "Error parsing booking data", e);
+            // Silent error handling
             Toast.makeText(this, "Lỗi khi xử lý dữ liệu đặt xe", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
-
-        btnContactSupport.setOnClickListener(v -> {
-            Toast.makeText(this, "Liên hệ hỗ trợ cho đơn #" + bookingId, Toast.LENGTH_SHORT).show();
-            // TODO: Open support chat or call
-        });
 
         btnPayment.setOnClickListener(v -> {
             if (checkoutUrl != null && !checkoutUrl.isEmpty()) {
@@ -213,6 +225,8 @@ public class BookingDetailsActivity extends AppCompatActivity {
         switch (status.toLowerCase()) {
             case "pending":
                 return "Chờ xác nhận";
+            case "reserved":
+                return "Đã đặt";
             case "active":
                 return "Đang hoạt động";
             case "completed":
@@ -237,11 +251,72 @@ public class BookingDetailsActivity extends AppCompatActivity {
                 .setTitle("Hủy đơn đặt xe")
                 .setMessage("Bạn có chắc chắn muốn hủy đơn đặt xe này? Hành động này không thể hoàn tác.")
                 .setPositiveButton("Hủy đơn", (dialog, which) -> {
-                    // TODO: Call API to cancel booking
-                    Toast.makeText(this, "Đã hủy đơn đặt xe #" + bookingId, Toast.LENGTH_SHORT).show();
-                    finish();
+                    // Call API to cancel booking
+                    cancelBooking();
                 })
                 .setNegativeButton("Không", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    /**
+     * Load vehicle image with fallback to fetch vehicle details if URL is null
+     */
+    private void loadVehicleImage(com.example.prm_project.models.Booking.Vehicle vehicle) {
+        String imageUrl = vehicle.getMainImageUrl();
+        
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            // Load image directly
+            Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.xe1)
+                    .error(R.drawable.xe1)
+                    .centerCrop()
+                    .into(ivVehicleImage);
+        } else {
+            // Fetch vehicle details to get image URL
+            String vehicleId = vehicle.getId();
+            if (vehicleId != null) {
+                vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
+                    @Override
+                    public void onSuccess(com.example.prm_project.models.Vehicle vehicleDetails) {
+                        String vehicleImageUrl = vehicleDetails.getMainImageUrl();
+                        if (vehicleImageUrl != null && !vehicleImageUrl.isEmpty()) {
+                            Glide.with(BookingDetailsActivity.this)
+                                    .load(vehicleImageUrl)
+                                    .placeholder(R.drawable.xe1)
+                                    .error(R.drawable.xe1)
+                                    .centerCrop()
+                                    .into(ivVehicleImage);
+                        } else {
+                            ivVehicleImage.setImageResource(R.drawable.xe1);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        // Use placeholder on error
+                        ivVehicleImage.setImageResource(R.drawable.xe1);
+                    }
+                });
+            } else {
+                // No vehicle ID, use placeholder
+                ivVehicleImage.setImageResource(R.drawable.xe1);
+            }
+        }
+    }
+
+    /**
+     * Cancel booking via API
+     */
+    private void cancelBooking() {
+        bookingRepository.cancelBooking(bookingId).observe(this, cancelledBooking -> {
+            if (cancelledBooking != null) {
+                // Success - refresh the booking data or finish activity
+                Toast.makeText(this, "Đơn đặt xe đã được hủy", Toast.LENGTH_SHORT).show();
+                // Reload booking data to update UI
+                loadBookingData();
+            }
+            // Error toast is already shown in repository
+        });
     }
 }

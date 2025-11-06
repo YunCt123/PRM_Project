@@ -11,10 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
+import com.example.prm_project.activies.VerifyAccountActivity;
+import com.example.prm_project.utils.SessionManager;
 
 import java.util.List;
 
@@ -22,10 +25,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
 
     private List<Vehicle> vehicleList;
     private Context context;
+    private SessionManager sessionManager;
 
     public VehicleAdapter(List<Vehicle> vehicleList, Context context) {
         this.vehicleList = vehicleList;
         this.context = context;
+        this.sessionManager = new SessionManager(context);
     }
 
     @NonNull
@@ -90,7 +95,13 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         });
 
         holder.btnBookNow.setOnClickListener(v -> {
-            // Navigate to PaymentActivity directly
+            // Check if user is verified before allowing booking
+            if (!sessionManager.isVerified()) {
+                showVerificationRequiredDialog();
+                return;
+            }
+            
+            // User is verified, proceed to payment
             Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
 
             // Pass vehicle data
@@ -131,6 +142,25 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
     @Override
     public int getItemCount() {
         return vehicleList.size();
+    }
+
+    /**
+     * Show dialog when user is not verified
+     */
+    private void showVerificationRequiredDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Yêu cầu xác minh tài khoản")
+                .setMessage("Bạn cần xác minh tài khoản trước khi có thể đặt xe. Vui lòng hoàn tất việc xác minh để tiếp tục.")
+                .setPositiveButton("Xác minh ngay", (dialog, which) -> {
+                    // Navigate to VerifyAccountActivity
+                    Intent verifyIntent = new Intent(context, VerifyAccountActivity.class);
+                    context.startActivity(verifyIntent);
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
     }
 
     public static class VehicleViewHolder extends RecyclerView.ViewHolder {

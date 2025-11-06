@@ -57,6 +57,7 @@ public class VerifyAccountActivity extends AppCompatActivity {
     private View placeholderIdFront, placeholderIdBack, placeholderLicenseFront, placeholderLicenseBack;
     private MaterialButton btnSubmit;
     private TextView tvKycStatus;
+    private EditText etIdNumber, etLicenseNumber;
 
     private Uri idFrontUri, idBackUri, licenseFrontUri, licenseBackUri;
     private int currentImageType = 0; // 1: ID Front, 2: ID Back, 3: License Front, 4: License Back
@@ -82,6 +83,9 @@ public class VerifyAccountActivity extends AppCompatActivity {
         setupImagePicker();
         setupListeners();
 
+        // Load existing KYC data if available
+        loadExistingKycData();
+
         // Update UI according to current verification status
         updateStatusFromSession();
     }
@@ -94,6 +98,8 @@ public class VerifyAccountActivity extends AppCompatActivity {
         layoutLicenseBack = findViewById(R.id.layoutLicenseBack);
         btnSubmit = findViewById(R.id.btnSubmit);
         tvKycStatus = findViewById(R.id.tvKycStatus);
+        etIdNumber = findViewById(R.id.etIdNumber);
+        etLicenseNumber = findViewById(R.id.etLicenseNumber);
 
         // ImageViews for preview
         ivIdFront = findViewById(R.id.ivIdFront);
@@ -112,8 +118,10 @@ public class VerifyAccountActivity extends AppCompatActivity {
         imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+                Log.d(TAG, "Image picker result code: " + result.getResultCode());
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
+                    Log.d(TAG, "Selected image URI: " + selectedImageUri);
 
                     if (selectedImageUri == null) {
                         Toast.makeText(this, "Không thể lấy ảnh đã chọn", Toast.LENGTH_SHORT).show();
@@ -159,30 +167,68 @@ public class VerifyAccountActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
+        // Text watchers for EditTexts
+        android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkAllUploaded();
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        };
+
+        etIdNumber.addTextChangedListener(textWatcher);
+        etLicenseNumber.addTextChangedListener(textWatcher);
+
         // Upload listeners - open image picker
         layoutIdFront.setOnClickListener(v -> {
+            Log.d(TAG, "ID Front clicked");
             currentImageType = 1;
             openImagePicker();
         });
 
         layoutIdBack.setOnClickListener(v -> {
+            Log.d(TAG, "ID Back clicked");
             currentImageType = 2;
             openImagePicker();
         });
 
         layoutLicenseFront.setOnClickListener(v -> {
+            Log.d(TAG, "License Front clicked");
             currentImageType = 3;
             openImagePicker();
         });
 
         layoutLicenseBack.setOnClickListener(v -> {
+            Log.d(TAG, "License Back clicked");
             currentImageType = 4;
             openImagePicker();
         });
 
         btnSubmit.setOnClickListener(v -> {
+            // Validate images
             if (idFrontUri == null || idBackUri == null || licenseFrontUri == null || licenseBackUri == null) {
                 Toast.makeText(this, "Vui lòng chọn đầy đủ ảnh giấy tờ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validate ID number
+            String idNumber = etIdNumber.getText() != null ? etIdNumber.getText().toString().trim() : "";
+            if (idNumber.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số CMND/CCCD", Toast.LENGTH_SHORT).show();
+                etIdNumber.requestFocus();
+                return;
+            }
+
+            // Validate License number
+            String licenseNumber = etLicenseNumber.getText() != null ? etLicenseNumber.getText().toString().trim() : "";
+            if (licenseNumber.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số giấy phép lái xe", Toast.LENGTH_SHORT).show();
+                etLicenseNumber.requestFocus();
                 return;
             }
 
@@ -191,14 +237,46 @@ public class VerifyAccountActivity extends AppCompatActivity {
     }
 
     private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        imagePickerLauncher.launch(intent);
+        Log.d(TAG, "Opening image picker for type: " + currentImageType);
+        
+        // Check permission before opening picker
+        boolean hasPermission = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        Log.d(TAG, "Has permission: " + hasPermission);
+
+        if (!hasPermission) {
+            Toast.makeText(this, "Vui lòng cấp quyền truy cập ảnh", Toast.LENGTH_SHORT).show();
+            checkAndRequestStoragePermission();
+            return;
+        }
+
+        try {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+            Log.d(TAG, "Image picker launched successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Error launching image picker", e);
+            Toast.makeText(this, "Lỗi mở trình chọn ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void checkAllUploaded() {
-        if (idFrontUri != null && idBackUri != null && licenseFrontUri != null && licenseBackUri != null) {
+        String idNumber = etIdNumber.getText() != null ? etIdNumber.getText().toString().trim() : "";
+        String licenseNumber = etLicenseNumber.getText() != null ? etLicenseNumber.getText().toString().trim() : "";
+        
+        if (idFrontUri != null && idBackUri != null && licenseFrontUri != null && licenseBackUri != null 
+            && !idNumber.isEmpty() && !licenseNumber.isEmpty()) {
             btnSubmit.setEnabled(true);
             btnSubmit.setBackgroundTintList(getResources().getColorStateList(R.color.primary_green, null));
+        } else {
+            btnSubmit.setEnabled(false);
+            btnSubmit.setBackgroundTintList(getResources().getColorStateList(R.color.gray_300, null));
         }
     }
 
@@ -275,6 +353,12 @@ public class VerifyAccountActivity extends AppCompatActivity {
                     MultipartBody.Part namePart = MultipartBody.Part.createFormData("name", null, RequestBody.create(MediaType.parse("text/plain"), userName));
                     RequestBody phone = RequestBody.create(MediaType.parse("text/plain"), (currentUser != null && currentUser.getPhone() != null) ? currentUser.getPhone() : "");
                     RequestBody gender = RequestBody.create(MediaType.parse("text/plain"), (currentUser != null && currentUser.getGender() != null) ? currentUser.getGender() : "");
+                    
+                    // Get ID and License numbers
+                    String idNum = etIdNumber.getText() != null ? etIdNumber.getText().toString().trim() : "";
+                    String licenseNum = etLicenseNumber.getText() != null ? etLicenseNumber.getText().toString().trim() : "";
+                    RequestBody idNumber = RequestBody.create(MediaType.parse("text/plain"), idNum);
+                    RequestBody licenseNumber = RequestBody.create(MediaType.parse("text/plain"), licenseNum);
 
                     // Call API
                     Call<ApiResponse<User>> call = userApiService.updateProfile(
@@ -286,7 +370,9 @@ public class VerifyAccountActivity extends AppCompatActivity {
                         licenseFrontPart,
                         licenseBackPart,
                         idFrontPart,
-                        idBackPart
+                        idBackPart,
+                        licenseNumber,
+                        idNumber
                     );
 
                     call.enqueue(new Callback<ApiResponse<User>>() {
@@ -463,18 +549,31 @@ public class VerifyAccountActivity extends AppCompatActivity {
     }
 
     private void disableInputsForStatus() {
+        Log.d(TAG, "Disabling inputs (verified/pending status)");
+        // Disable clicking to change images, but keep them visible
         layoutIdFront.setClickable(false);
         layoutIdBack.setClickable(false);
         layoutLicenseFront.setClickable(false);
         layoutLicenseBack.setClickable(false);
+        // Don't disable the layouts themselves - just make them not clickable
+        // This allows images to still be displayed
+        etIdNumber.setEnabled(false);
+        etLicenseNumber.setEnabled(false);
         btnSubmit.setEnabled(false);
     }
 
     private void enableInputsForEditing() {
+        Log.d(TAG, "Enabling inputs");
         layoutIdFront.setClickable(true);
         layoutIdBack.setClickable(true);
         layoutLicenseFront.setClickable(true);
         layoutLicenseBack.setClickable(true);
+        layoutIdFront.setEnabled(true);
+        layoutIdBack.setEnabled(true);
+        layoutLicenseFront.setEnabled(true);
+        layoutLicenseBack.setEnabled(true);
+        etIdNumber.setEnabled(true);
+        etLicenseNumber.setEnabled(true);
         // btnSubmit will be enabled only after all images selected
         checkAllUploaded();
     }
@@ -484,6 +583,99 @@ public class VerifyAccountActivity extends AppCompatActivity {
         super.onResume();
         // Refresh profile from backend to get latest KYC status when user returns
         refreshProfileFromApi();
+    }
+
+    private void loadExistingKycData() {
+        User user = sessionManager.getUserDetails();
+        Log.d(TAG, "loadExistingKycData - User: " + (user != null ? "exists" : "null"));
+        
+        if (user == null) {
+            Log.w(TAG, "No user in session");
+            return;
+        }
+        
+        if (user.getKyc() == null) {
+            Log.w(TAG, "User has no KYC data");
+            return;
+        }
+
+        User.Kyc kyc = user.getKyc();
+        Log.d(TAG, "Loading existing KYC data - idNumber: " + kyc.getIdNumber() + 
+                   ", licenseNumber: " + kyc.getLicenseNumber());
+
+        // Load ID Number
+        if (kyc.getIdNumber() != null && !kyc.getIdNumber().isEmpty()) {
+            etIdNumber.setText(kyc.getIdNumber());
+            Log.d(TAG, "Loaded ID Number: " + kyc.getIdNumber());
+        }
+
+        // Load License Number
+        if (kyc.getLicenseNumber() != null && !kyc.getLicenseNumber().isEmpty()) {
+            etLicenseNumber.setText(kyc.getLicenseNumber());
+            Log.d(TAG, "Loaded License Number: " + kyc.getLicenseNumber());
+        }
+
+        // Load images using Glide or similar library
+        if (kyc.getIdFrontImage() != null && kyc.getIdFrontImage().getUrl() != null) {
+            loadImageFromUrl(kyc.getIdFrontImage().getUrl(), ivIdFront, placeholderIdFront);
+            Log.d(TAG, "Loading ID Front image: " + kyc.getIdFrontImage().getUrl());
+        }
+
+        if (kyc.getIdBackImage() != null && kyc.getIdBackImage().getUrl() != null) {
+            loadImageFromUrl(kyc.getIdBackImage().getUrl(), ivIdBack, placeholderIdBack);
+            Log.d(TAG, "Loading ID Back image: " + kyc.getIdBackImage().getUrl());
+        }
+
+        if (kyc.getLicenseFrontImage() != null && kyc.getLicenseFrontImage().getUrl() != null) {
+            loadImageFromUrl(kyc.getLicenseFrontImage().getUrl(), ivLicenseFront, placeholderLicenseFront);
+            Log.d(TAG, "Loading License Front image: " + kyc.getLicenseFrontImage().getUrl());
+        }
+
+        if (kyc.getLicenseBackImage() != null && kyc.getLicenseBackImage().getUrl() != null) {
+            loadImageFromUrl(kyc.getLicenseBackImage().getUrl(), ivLicenseBack, placeholderLicenseBack);
+            Log.d(TAG, "Loading License Back image: " + kyc.getLicenseBackImage().getUrl());
+        }
+    }
+
+    private void loadImageFromUrl(String imageUrl, ImageView imageView, View placeholder) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            Log.w(TAG, "Image URL is null or empty");
+            return;
+        }
+
+        Log.d(TAG, "Loading image from URL: " + imageUrl);
+        
+        // Hide placeholder and show ImageView first
+        placeholder.setVisibility(View.GONE);
+        imageView.setVisibility(View.VISIBLE);
+        
+        // Use Glide to load image
+        com.bumptech.glide.Glide.with(this)
+                .load(imageUrl)
+                .centerCrop()
+                .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@androidx.annotation.Nullable com.bumptech.glide.load.engine.GlideException e, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, boolean isFirstResource) {
+                        Log.e(TAG, "Glide FAILED to load image: " + imageUrl);
+                        if (e != null) {
+                            Log.e(TAG, "Glide error details: " + e.getMessage());
+                            e.logRootCauses(TAG);
+                        }
+                        // Show placeholder again on error
+                        runOnUiThread(() -> {
+                            placeholder.setVisibility(View.VISIBLE);
+                            imageView.setVisibility(View.GONE);
+                        });
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model, com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                        Log.d(TAG, "Glide SUCCESS - loaded image: " + imageUrl);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
 
     private void refreshProfileFromApi() {
@@ -500,6 +692,8 @@ public class VerifyAccountActivity extends AppCompatActivity {
                     if (user != null) {
                         // Persist the latest user (including kyc/isVerified)
                         sessionManager.createLoginSession(user, token);
+                        // Reload KYC data
+                        loadExistingKycData();
                         // Update UI
                         updateStatusFromSession();
                         Log.d(TAG, "Profile refreshed, kyc=" + user.getVerificationStatus());
@@ -529,6 +723,12 @@ public class VerifyAccountActivity extends AppCompatActivity {
         RequestBody phone = RequestBody.create(MediaType.parse("text/plain"), (currentUser != null && currentUser.getPhone() != null) ? currentUser.getPhone() : "");
         RequestBody gender = RequestBody.create(MediaType.parse("text/plain"), (currentUser != null && currentUser.getGender() != null) ? currentUser.getGender() : "");
         MultipartBody.Part namePart = MultipartBody.Part.createFormData("name", null, nameRb);
+        
+        // Get ID and License numbers
+        String idNum = etIdNumber.getText() != null ? etIdNumber.getText().toString().trim() : "";
+        String licenseNum = etLicenseNumber.getText() != null ? etLicenseNumber.getText().toString().trim() : "";
+        RequestBody idNumber = RequestBody.create(MediaType.parse("text/plain"), idNum);
+        RequestBody licenseNumber = RequestBody.create(MediaType.parse("text/plain"), licenseNum);
 
         Call<ApiResponse<User>> call = userApiService.updateProfile(
                 "Bearer " + token,
@@ -539,7 +739,9 @@ public class VerifyAccountActivity extends AppCompatActivity {
                 licenseFrontPart,
                 licenseBackPart,
                 idFrontPart,
-                idBackPart
+                idBackPart,
+                licenseNumber,
+                idNumber
         );
 
         call.enqueue(new Callback<ApiResponse<User>>() {
