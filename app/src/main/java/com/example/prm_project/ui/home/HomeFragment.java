@@ -22,7 +22,6 @@ import com.example.prm_project.databinding.FragmentHomeBinding;
 import com.example.prm_project.repository.VehicleRepository;
 import com.example.prm_project.utils.SessionManager;
 import com.example.prm_project.utils.VehicleConverter;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -45,9 +44,9 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Initialize repository and session manager
+        // Initialize session manager and repository
+        sessionManager = new SessionManager(getContext());
         vehicleRepository = new VehicleRepository();
-        sessionManager = new SessionManager(requireContext());
 
         setupRecyclerView();
         setupDatePickers();
@@ -107,53 +106,62 @@ public class HomeFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    private void setupLoginLogoutButton() {
+    public void login() {
+        // Login logic here
         // Initialize loginButton - find it from the root view since it's in an included layout
         loginButton = binding.getRoot().findViewById(R.id.btn_Login);
         if (loginButton != null) {
-            updateLoginLogoutButton();
-        }
-    }
-
-    private void updateLoginLogoutButton() {
-        if (loginButton == null) return;
-
-        // Check if user is logged in
-        if (sessionManager.isLoggedIn()) {
-            // User is logged in - show Logout button
-            loginButton.setText("Logout");
-            loginButton.setOnClickListener(v -> showLogoutDialog());
-        } else {
-            // User is not logged in - show Get Started button
-            loginButton.setText("Get Started");
-            loginButton.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle login button click
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
             });
         }
     }
 
-    private void showLogoutDialog() {
-        new MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Đăng xuất")
-            .setMessage("Bạn có chắc chắn muốn đăng xuất?")
-            .setPositiveButton("Đăng xuất", (dialog, which) -> {
-                // Logout user
-                sessionManager.logout();
-                
-                // Show success message
-                Toast.makeText(getContext(), "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
-                
-                // Update button
-                updateLoginLogoutButton();
-                
-                // Navigate to login screen
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            })
-            .setNegativeButton("Hủy", null)
-            .show();
+    private void setupLoginLogoutButton() {
+        loginButton = binding.getRoot().findViewById(R.id.btn_Login);
+        if (loginButton != null) {
+            updateButtonState();
+            
+            loginButton.setOnClickListener(v -> {
+                if (sessionManager.isLoggedIn()) {
+                    // Logout
+                    sessionManager.logout();
+                    Toast.makeText(getContext(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                    updateButtonState();
+                    
+                    // Optionally, navigate to LoginActivity
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                } else {
+                    // Login
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+    
+    private void updateButtonState() {
+        if (loginButton != null && sessionManager != null) {
+            if (sessionManager.isLoggedIn()) {
+                loginButton.setText("Logout");
+            } else {
+                loginButton.setText("Get Started");
+            }
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Update button state when returning to this fragment
+        updateButtonState();
     }
 
     private void searchVehicles(String location, String pickupDate, String returnDate) {
@@ -207,13 +215,6 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Update button state when fragment resumes (e.g., after login)
-        updateLoginLogoutButton();
     }
 
     @Override
