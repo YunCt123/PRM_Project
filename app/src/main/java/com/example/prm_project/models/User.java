@@ -46,34 +46,51 @@ public class User {
 
     public static class Kyc {
         @SerializedName("idFrontImage")
-        private String idFrontImage;
+        private ImageData idFrontImage;
 
         @SerializedName("idBackImage")
-        private String idBackImage;
+        private ImageData idBackImage;
 
         @SerializedName("licenseFrontImage")
-        private String licenseFrontImage;
+        private ImageData licenseFrontImage;
 
         @SerializedName("licenseBackImage")
-        private String licenseBackImage;
+        private ImageData licenseBackImage;
 
         @SerializedName("verifiedAt")
         private String verifiedAt;
 
-        public String getIdFrontImage() { return idFrontImage; }
-        public void setIdFrontImage(String idFrontImage) { this.idFrontImage = idFrontImage; }
+        public ImageData getIdFrontImage() { return idFrontImage; }
+        public void setIdFrontImage(ImageData idFrontImage) { this.idFrontImage = idFrontImage; }
 
-        public String getIdBackImage() { return idBackImage; }
-        public void setIdBackImage(String idBackImage) { this.idBackImage = idBackImage; }
+        public ImageData getIdBackImage() { return idBackImage; }
+        public void setIdBackImage(ImageData idBackImage) { this.idBackImage = idBackImage; }
 
-        public String getLicenseFrontImage() { return licenseFrontImage; }
-        public void setLicenseFrontImage(String licenseFrontImage) { this.licenseFrontImage = licenseFrontImage; }
+        public ImageData getLicenseFrontImage() { return licenseFrontImage; }
+        public void setLicenseFrontImage(ImageData licenseFrontImage) { this.licenseFrontImage = licenseFrontImage; }
 
-        public String getLicenseBackImage() { return licenseBackImage; }
-        public void setLicenseBackImage(String licenseBackImage) { this.licenseBackImage = licenseBackImage; }
+        public ImageData getLicenseBackImage() { return licenseBackImage; }
+        public void setLicenseBackImage(ImageData licenseBackImage) { this.licenseBackImage = licenseBackImage; }
 
         public String getVerifiedAt() { return verifiedAt; }
         public void setVerifiedAt(String verifiedAt) { this.verifiedAt = verifiedAt; }
+
+        // Helper methods to get URL directly
+        public String getIdFrontImageUrl() {
+            return idFrontImage != null ? idFrontImage.getUrl() : null;
+        }
+
+        public String getIdBackImageUrl() {
+            return idBackImage != null ? idBackImage.getUrl() : null;
+        }
+
+        public String getLicenseFrontImageUrl() {
+            return licenseFrontImage != null ? licenseFrontImage.getUrl() : null;
+        }
+
+        public String getLicenseBackImageUrl() {
+            return licenseBackImage != null ? licenseBackImage.getUrl() : null;
+        }
     }
 
     // Constructors

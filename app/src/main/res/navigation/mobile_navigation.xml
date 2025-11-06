@@ -40,4 +40,10 @@
         android:name="com.example.prm_project.ui.profile.SettingsFragment"
         android:label="@string/settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/navigation_booking_history"
+        android:name="com.example.prm_project.ui.bookings.BookingHistoryFragment"
+        android:label="Lịch sử thuê xe"
+        tools:layout="@layout/fragment_booking_history" />
 </navigation>
