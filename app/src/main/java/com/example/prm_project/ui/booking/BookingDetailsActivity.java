@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.prm_project.R;
-import com.example.prm_project.repository.BookingRespository;
+import com.example.prm_project.repository.BookingRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -41,14 +41,14 @@ public class BookingDetailsActivity extends AppCompatActivity {
     private String bookingId;
     private String status;
     private String checkoutUrl;
-    private BookingRespository bookingRepository;
+    private BookingRepository bookingRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_details);
 
-        bookingRepository = new BookingRespository(this);
+        bookingRepository = new BookingRepository(this);
 
         initViews();
         loadBookingData();

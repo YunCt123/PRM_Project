@@ -46,21 +46,24 @@ public class DetailActivity extends AppCompatActivity {
             vehicleId = intent.getStringExtra("vehicle_id");
             vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
 
+            // Use constructor with ID and prices
             vehicle = new Vehicle(
-                intent.getStringExtra("vehicle_name"),
-                intent.getStringExtra("vehicle_details"),
-                intent.getStringExtra("vehicle_battery"),
-                intent.getStringExtra("vehicle_range"),
-                intent.getStringExtra("vehicle_seats"),
-                intent.getStringExtra("vehicle_location"),
-                intent.getStringExtra("vehicle_price"),
-                intent.getStringExtra("vehicle_price_details"),
-                intent.getStringExtra("vehicle_status"),
-                intent.getStringExtra("vehicle_rating"),
-                intent.getStringExtra("vehicle_condition"),
-                vehicleImageUrl,
-                null, // brand
-                vehicleId // id
+                vehicleId,                                          // id
+                intent.getStringExtra("vehicle_name"),              // name
+                intent.getStringExtra("vehicle_details"),           // details
+                intent.getStringExtra("vehicle_battery"),           // batteryPercent
+                intent.getStringExtra("vehicle_range"),             // range
+                intent.getStringExtra("vehicle_seats"),             // seats
+                intent.getStringExtra("vehicle_location"),          // location
+                intent.getStringExtra("vehicle_price"),             // price
+                intent.getStringExtra("vehicle_price_details"),     // priceDetails
+                intent.getStringExtra("vehicle_status"),            // status
+                intent.getStringExtra("vehicle_rating"),            // rating
+                intent.getStringExtra("vehicle_condition"),         // condition
+                vehicleImageUrl,                                    // imageUrl
+                null,                                               // brand
+                pricePerDay,                                        // pricePerDay
+                pricePerHour                                        // pricePerHour
             );
 
             setupViews();

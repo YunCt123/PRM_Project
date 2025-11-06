@@ -25,7 +25,7 @@ import androidx.core.text.HtmlCompat;
 import com.example.prm_project.R;
 import com.example.prm_project.models.Booking;
 import com.example.prm_project.models.Vehicle;
-import com.example.prm_project.repository.BookingRespository;
+import com.example.prm_project.repository.BookingRepository;
 import com.example.prm_project.repository.VehicleRepository;
 
 import java.text.SimpleDateFormat;
@@ -61,7 +61,7 @@ public class BookingActivity extends AppCompatActivity {
     private int vehicleImageRes;
     private String vehicleId;
     private int documentsUploaded = 0;
-    private BookingRespository bookingRepository;
+    private BookingRepository bookingRepository;
     private VehicleRepository vehicleRepository;
     private Vehicle vehicle;
 
@@ -91,7 +91,7 @@ public class BookingActivity extends AppCompatActivity {
         setupClickListeners();
         initializeCalendars();
         setupSpinner();
-        bookingRepository = new BookingRespository(this);
+        bookingRepository = new BookingRepository(this);
         vehicleRepository = new VehicleRepository();
     }
 

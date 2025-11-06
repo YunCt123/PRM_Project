@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.prm_project.databinding.FragmentBookingListBinding;
-import com.example.prm_project.repository.BookingRespository;
+import com.example.prm_project.repository.BookingRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class BookingListFragment extends Fragment {
     private FragmentBookingListBinding binding;
     private BookingAdapter bookingAdapter;
     private List<Booking> bookingList;
-    private BookingRespository bookingRepository;
+    private BookingRepository bookingRepository;
 
     public static BookingListFragment newInstance(String status) {
         BookingListFragment fragment = new BookingListFragment();
@@ -44,7 +44,7 @@ public class BookingListFragment extends Fragment {
         if (getArguments() != null) {
             bookingStatus = getArguments().getString(ARG_STATUS);
         }
-        bookingRepository = new BookingRespository(requireContext());
+        bookingRepository = new BookingRepository(requireContext());
     }
 
     @Override

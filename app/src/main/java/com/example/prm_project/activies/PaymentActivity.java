@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -78,7 +77,7 @@ public class PaymentActivity extends AppCompatActivity {
         apiFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         
         // Initialize repositories
-        bookingRepository = new BookingRepository();
+        bookingRepository = new BookingRepository(this);
         sessionManager = new SessionManager(this);
         
         // Initialize calendars - default start now, end 1 day later
@@ -87,8 +86,6 @@ public class PaymentActivity extends AppCompatActivity {
         endDateTime.add(Calendar.DAY_OF_MONTH, 1);
         
         initViews();
-        vehicleRepository = new VehicleRepository();
-        bookingRepository = new BookingRespository(this);
         getIntentData();
         setupListeners();
         
@@ -141,35 +138,6 @@ public class PaymentActivity extends AppCompatActivity {
         // Update UI
         tvVehicleName.setText(vehicleName);
         tvPickupLocation.setText(stationName);
-    }
-
-    private void fetchVehicleDetails(String vehicleId) {
-        Log.d("PaymentActivity", "Fetching vehicle details for ID: " + vehicleId);
-        vehicleRepository.getVehicleById(vehicleId, new VehicleRepository.SingleVehicleCallback() {
-            @Override
-            public void onSuccess(Vehicle fetchedVehicle) {
-                Log.d("PaymentActivity", "Vehicle fetched successfully: " + fetchedVehicle);
-                if (fetchedVehicle != null) {
-                    Log.d("PaymentActivity", "PricePerHour: " + fetchedVehicle.getPricePerHour() + ", PricePerDay: " + fetchedVehicle.getPricePerDay());
-                }
-                vehicle = fetchedVehicle;
-                if (vehicle != null) {
-                    unitPricePerHour = vehicle.getPricePerHour();
-                    unitPricePerDay = vehicle.getPricePerDay();
-                    updatePriceDisplay();
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                Log.e("PaymentActivity", "Error fetching vehicle: " + errorMessage);
-                Toast.makeText(PaymentActivity.this, "Không thể tải thông tin xe: " + errorMessage, Toast.LENGTH_SHORT).show();
-                // Disable payment since we can't calculate prices
-                btnProceedPayment.setEnabled(false);
-                btnProceedPayment.setBackgroundTintList(getResources().getColorStateList(R.color.gray_300, null));
-                btnProceedPayment.setTextColor(getColor(R.color.gray_500));
-            }
-        });
     }
 
     private void setupListeners() {
@@ -376,66 +344,53 @@ public class PaymentActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
         
-        // Get token
-        String token = sessionManager.getToken();
-        
         // Format dates to API format
         String startTimeStr = apiFormat.format(startDateTime.getTime());
         String endTimeStr = apiFormat.format(endDateTime.getTime());
         
         Log.d(TAG, "Creating booking: vehicleId=" + vehicleId + ", start=" + startTimeStr + ", end=" + endTimeStr);
         
-        // Call API to create booking
-        bookingRepository.createBooking(token, vehicleId, startTimeStr, endTimeStr, new BookingRepository.BookingCallback() {
-            @Override
-            public void onSuccess(BookingResponse response) {
-                runOnUiThread(() -> {
-                    progressDialog.dismiss();
-                    
-                    // Log response
-                    Log.d(TAG, "Booking created successfully!");
-                    Log.d(TAG, "Booking ID: " + response.getBookingId());
-                    Log.d(TAG, "Status: " + response.getStatus());
-                    Log.d(TAG, "Amount: " + response.getAmountEstimated() + " VND");
-                    Log.d(TAG, "Checkout URL: " + response.getCheckoutUrl());
-                    
-                    // Show success message
-                    Toast.makeText(PaymentActivity.this, 
-                        "Đã tạo booking! Chuyển đến trang thanh toán PayOS...", 
-                        Toast.LENGTH_LONG).show();
-                    
-                    // Open PayOS checkout URL in browser
-                    if (response.getCheckoutUrl() != null && !response.getCheckoutUrl().isEmpty()) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(response.getCheckoutUrl()));
-                        startActivity(browserIntent);
-                        
-                        // Set result and finish
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("booking_id", response.getBookingId());
-                        resultIntent.putExtra("payment_method", "PayOS");
-                        resultIntent.putExtra("amount", response.getAmountEstimated());
-                        resultIntent.putExtra("status", response.getStatus());
-                        resultIntent.putExtra("checkout_url", response.getCheckoutUrl());
-                        setResult(RESULT_OK, resultIntent);
-                        
-                        // Finish activity after a short delay
-                        new android.os.Handler().postDelayed(() -> finish(), 1000);
-                    } else {
-                        Toast.makeText(PaymentActivity.this, "Không thể mở trang thanh toán", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        // Call API to create booking using LiveData
+        bookingRepository.createBooking(vehicleId, startTimeStr, endTimeStr).observe(this, response -> {
+            progressDialog.dismiss();
             
-            @Override
-            public void onError(String errorMessage) {
-                runOnUiThread(() -> {
-                    progressDialog.dismiss();
+            if (response != null) {
+                // Log response
+                Log.d(TAG, "Booking created successfully!");
+                Log.d(TAG, "Booking ID: " + response.getBookingId());
+                Log.d(TAG, "Status: " + response.getStatus());
+                Log.d(TAG, "Amount: " + response.getAmountEstimated() + " VND");
+                Log.d(TAG, "Checkout URL: " + response.getCheckoutUrl());
+                
+                // Show success message
+                Toast.makeText(PaymentActivity.this, 
+                    "Đã tạo booking! Chuyển đến trang thanh toán PayOS...", 
+                    Toast.LENGTH_LONG).show();
+                
+                // Open PayOS checkout URL in browser
+                if (response.getCheckoutUrl() != null && !response.getCheckoutUrl().isEmpty()) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(response.getCheckoutUrl()));
+                    startActivity(browserIntent);
                     
-                    Log.e(TAG, "Booking error: " + errorMessage);
-                    Toast.makeText(PaymentActivity.this, 
-                        "Lỗi tạo booking: " + errorMessage, 
-                        Toast.LENGTH_LONG).show();
-                });
+                    // Set result and finish
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("booking_id", response.getBookingId());
+                    resultIntent.putExtra("payment_method", "PayOS");
+                    resultIntent.putExtra("amount", response.getAmountEstimated());
+                    resultIntent.putExtra("status", response.getStatus());
+                    resultIntent.putExtra("checkout_url", response.getCheckoutUrl());
+                    setResult(RESULT_OK, resultIntent);
+                    
+                    // Finish activity after a short delay
+                    new android.os.Handler().postDelayed(() -> finish(), 1000);
+                } else {
+                    Toast.makeText(PaymentActivity.this, "Không thể mở trang thanh toán", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Log.e(TAG, "Booking failed: response is null");
+                Toast.makeText(PaymentActivity.this, 
+                    "Lỗi tạo booking. Vui lòng thử lại.", 
+                    Toast.LENGTH_LONG).show();
             }
         });
     }

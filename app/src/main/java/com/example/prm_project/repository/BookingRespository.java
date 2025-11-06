@@ -10,6 +10,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.prm_project.api.ApiClient;
 import com.example.prm_project.api.BookingApiService;
 import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.BookingRequest;
+import com.example.prm_project.models.BookingResponse;
+import com.example.prm_project.utils.SessionManager;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -23,28 +26,37 @@ public class BookingRespository {
     private BookingApiService bookingApiService;
     private Gson gson = new Gson();
     private Context context;
+    private SessionManager sessionManager;
 
     public BookingRespository(Context context) {
         this.context = context;
         this.bookingApiService = ApiClient.getAuthenticatedClient(context).create(BookingApiService.class);
+        this.sessionManager = new SessionManager(context);
     }
 
-    public LiveData<Booking> createBooking(Booking booking) {
-        MutableLiveData<Booking> data = new MutableLiveData<>();
+    public LiveData<BookingResponse> createBooking(String vehicleId, String startTime, String endTime) {
+        MutableLiveData<BookingResponse> data = new MutableLiveData<>();
+
+        // Create BookingRequest with deposit provider
+        BookingRequest bookingRequest = new BookingRequest(vehicleId, startTime, endTime, "payos");
 
         // Debug log the booking request
-        Log.d(TAG, "Creating booking - vehicleId: " + booking.getVehicleId());
-        Log.d(TAG, "Creating booking - startTime: " + booking.getStartTime());
-        Log.d(TAG, "Creating booking - endTime: " + booking.getEndTime());
-        Log.d(TAG, "Creating booking - deposit provider: " + booking.getDeposit().getProvider());
+        Log.d(TAG, "Creating booking - vehicleId: " + vehicleId);
+        Log.d(TAG, "Creating booking - startTime: " + startTime);
+        Log.d(TAG, "Creating booking - endTime: " + endTime);
+        Log.d(TAG, "Creating booking - deposit provider: payos");
 
         // Log the full JSON request body
-        String jsonBody = gson.toJson(booking);
+        String jsonBody = gson.toJson(bookingRequest);
         Log.d(TAG, "Booking request JSON: " + jsonBody);
 
-        bookingApiService.createBooking(booking).enqueue(new Callback<Booking>() {
+        // Get Bearer token
+        String token = sessionManager.getToken();
+        String authHeader = "Bearer " + token;
+
+        bookingApiService.createBooking(authHeader, bookingRequest).enqueue(new Callback<BookingResponse>() {
             @Override
-            public void onResponse(Call<Booking> call, Response<Booking> response) {
+            public void onResponse(Call<BookingResponse> call, Response<BookingResponse> response) {
                 Log.d(TAG, "Response received - Code: " + response.code() + ", Message: " + response.message());
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Booking created successfully: " + response.body());
@@ -62,19 +74,7 @@ public class BookingRespository {
                         try {
                             JSONObject json = new JSONObject(errorBody);
                             String message = json.optString("message", "Booking creation failed");
-                            if (message.contains("Minimum deposit") || message.contains("Vehicle valuation.valueVND is missing")) {
-                                // Treat as success for minimum deposit error or missing valuation
-                                Toast.makeText(context, "Đặt xe thành công với tiền thuê xe", Toast.LENGTH_LONG).show();
-                                // Create mock booking response
-                                Booking.Deposit mockDeposit = new Booking.Deposit("payos");
-                                Booking mockBooking = new Booking("mock", "mock", "mock", mockDeposit);
-                                mockBooking.setQrCode("00020101021238570010A000000727012700069704220113VQRQAFDAZ34300208QRIBFTTA5303704540750200005802VN62180814EVR");
-                                mockBooking.setCheckoutUrl("https://pay.payos.vn/web/mock");
-                                data.setValue(mockBooking);
-                                return;
-                            } else {
-                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                            }
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                         } catch (Exception parseException) {
                             Toast.makeText(context, "Tạo thông tin đặt xe thất bại", Toast.LENGTH_LONG).show();
                         }
@@ -87,10 +87,11 @@ public class BookingRespository {
             }
 
             @Override
-            public void onFailure(Call<Booking> call, Throwable t) {
+            public void onFailure(Call<BookingResponse> call, Throwable t) {
                 Log.e(TAG, "Booking creation network failure", t);
                 Log.e(TAG, "Request URL: " + call.request().url());
                 Log.e(TAG, "Request method: " + call.request().method());
+                Toast.makeText(context, "Lỗi mạng khi tạo booking", Toast.LENGTH_SHORT).show();
                 data.setValue(null);
             }
         });
