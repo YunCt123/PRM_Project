@@ -104,6 +104,7 @@ public class ProfileViewModel extends AndroidViewModel {
                         name.setValue(user.getName() != null ? user.getName() : "Unknown");
                         email.setValue(user.getEmail() != null ? user.getEmail() : "");
                         phone.setValue(user.getPhone() != null ? user.getPhone() : "");
+                        birthDate.setValue(user.getDateOfBirth() != null ? user.getDateOfBirth() : "");
 
                         // Update session with latest data
                         sessionManager.createLoginSession(user, token);

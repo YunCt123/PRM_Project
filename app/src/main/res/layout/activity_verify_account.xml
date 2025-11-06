@@ -21,8 +21,9 @@
 
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="12dp"
                 android:background="@drawable/bg_circle_button"
                 android:src="@drawable/ic_chevron_left_24dp"
                 app:tint="@color/black"
@@ -38,6 +39,18 @@
                 android:fontFamily="sans-serif-medium"
                 android:layout_marginStart="12dp" />
         </LinearLayout>
+
+        <!-- KYC status -->
+        <TextView
+            android:id="@+id/tvKycStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_input_field"
+            android:text="Trạng thái: Chưa gửi"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
 
         <!-- CMND/CCCD Card -->
         <com.google.android.material.card.MaterialCardView

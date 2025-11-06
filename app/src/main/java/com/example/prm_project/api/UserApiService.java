@@ -2,10 +2,12 @@ package com.example.prm_project.api;
 
 import com.example.prm_project.models.ApiResponse;
 import com.example.prm_project.models.User;
+import com.example.prm_project.models.UserUpdateRequest;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -29,10 +31,23 @@ public interface UserApiService {
     );
 
     /**
+     * Update basic user profile info (name, email, dateOfBirth, phone)
+     * PATCH /api/users/me
+     * @param token Authorization Bearer token
+     * @param request UserUpdateRequest with fields to update
+     * @return ApiResponse với User data
+     */
+    @PATCH("api/users/me")
+    Call<ApiResponse<User>> updateBasicProfile(
+            @Header("Authorization") String token,
+            @Body UserUpdateRequest request
+    );
+
+    /**
      * Update user profile with KYC documents
      * PATCH /api/users/me
      * @param token Authorization Bearer token
-     * @param name Tên người dùng
+     * @param namePart Multipart part containing name (form field 'name')
      * @param phone Số điện thoại
      * @param gender Giới tính
      * @param avatar File ảnh đại diện
@@ -46,7 +61,7 @@ public interface UserApiService {
     @PATCH("api/users/me")
     Call<ApiResponse<User>> updateProfile(
             @Header("Authorization") String token,
-            @Part("name") RequestBody name,
+            @Part MultipartBody.Part namePart,
             @Part("phone") RequestBody phone,
             @Part("gender") RequestBody gender,
             @Part MultipartBody.Part avatar,
