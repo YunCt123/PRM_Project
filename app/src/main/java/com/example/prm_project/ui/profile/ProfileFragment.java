@@ -2,6 +2,7 @@ package com.example.prm_project.ui.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,22 +24,31 @@ import com.example.prm_project.databinding.FragmentProfileBinding;
 import com.example.prm_project.utils.SessionManager;
 
 public class ProfileFragment extends Fragment {
+    private static final String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
     private SessionManager sessionManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         
         // Initialize SessionManager
         sessionManager = new SessionManager(requireContext());
 
+        Log.d(TAG, "ProfileFragment onCreateView");
+
         // Header: cập nhật tên, email
-        profileViewModel.getName().observe(getViewLifecycleOwner(), name -> binding.tvName.setText(name));
-        profileViewModel.getEmail().observe(getViewLifecycleOwner(), email -> binding.tvEmail.setText(email));
+        profileViewModel.getName().observe(getViewLifecycleOwner(), name -> {
+            Log.d(TAG, "Name changed in ViewModel: " + name);
+            binding.tvName.setText(name);
+        });
+        profileViewModel.getEmail().observe(getViewLifecycleOwner(), email -> {
+            Log.d(TAG, "Email changed in ViewModel: " + email);
+            binding.tvEmail.setText(email);
+        });
 
         // Observe loading state
         profileViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -94,7 +104,8 @@ public class ProfileFragment extends Fragment {
         LinearLayout llHistory = root.findViewById(R.id.llHistory);
         ((ImageView) llHistory.findViewById(R.id.ivMenuIcon)).setImageResource(R.drawable.ic_calendar_24dp);
         ((TextView) llHistory.findViewById(R.id.tvMenuTitle)).setText("Lịch sử thuê xe");
-        llHistory.setOnClickListener(v -> Toast.makeText(getContext(), "Lịch sử thuê xe", Toast.LENGTH_SHORT).show());
+        llHistory.setOnClickListener(v -> NavHostFragment.findNavController(ProfileFragment.this)
+                .navigate(R.id.navigation_booking_history));
 
         // Cài đặt
         LinearLayout llSettings = root.findViewById(R.id.llSettings);
@@ -137,6 +148,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "ProfileFragment onResume - reloading profile");
         // Reload profile data from API when fragment resumes
         if (profileViewModel != null) {
             profileViewModel.loadUserProfile();

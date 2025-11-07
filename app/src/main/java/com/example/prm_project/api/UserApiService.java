@@ -1,6 +1,7 @@
 package com.example.prm_project.api;
 
 import com.example.prm_project.models.ApiResponse;
+import com.example.prm_project.models.ProfileSettingsUpdateRequest;
 import com.example.prm_project.models.User;
 import com.example.prm_project.models.UserUpdateRequest;
 
@@ -41,6 +42,19 @@ public interface UserApiService {
     Call<ApiResponse<User>> updateBasicProfile(
             @Header("Authorization") String token,
             @Body UserUpdateRequest request
+    );
+
+    /**
+     * Update profile settings (name, phone, gender only)
+     * PATCH /api/users/me
+     * @param token Authorization Bearer token
+     * @param request ProfileSettingsUpdateRequest with name, phone, gender
+     * @return ApiResponse với User data
+     */
+    @PATCH("api/users/me")
+    Call<ApiResponse<User>> updateProfileSettings(
+            @Header("Authorization") String token,
+            @Body ProfileSettingsUpdateRequest request
     );
 
     /**
