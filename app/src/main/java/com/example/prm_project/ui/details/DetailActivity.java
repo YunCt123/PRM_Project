@@ -127,13 +127,19 @@ public class DetailActivity extends AppCompatActivity {
 
         // Set click listeners
         btnBookNow.setOnClickListener(v -> {
+            // Check if user is logged in first
+            if (!sessionManager.isLoggedIn()) {
+                showLoginRequiredDialog();
+                return;
+            }
+            
             // Check if user is verified before allowing booking
             if (!sessionManager.isVerified()) {
                 showVerificationRequiredDialog();
                 return;
             }
             
-            // User is verified, proceed to payment
+            // User is logged in and verified, proceed to payment
             Intent paymentIntent = new Intent(DetailActivity.this, PaymentActivity.class);
             
             // Pass vehicle ID
@@ -177,6 +183,27 @@ public class DetailActivity extends AppCompatActivity {
                     startActivity(verifyIntent);
                 })
                 .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
+    }
+
+    /**
+     * Show dialog when user is not logged in
+     */
+    private void showLoginRequiredDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Yêu cầu đăng nhập")
+                .setMessage("Bạn cần đăng nhập để đặt xe. Vui lòng đăng nhập để tiếp tục.")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    // Navigate to LoginActivity
+                    Intent loginIntent = new Intent(DetailActivity.this, com.example.prm_project.activies.LoginActivity.class);
+                    startActivity(loginIntent);
+                    // Optionally finish this activity so user can't go back
+                    // finish();
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .setCancelable(true)
