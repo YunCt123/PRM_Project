@@ -1,6 +1,7 @@
 package com.example.prm_project.ui.home;
 
 public class Vehicle {
+    private String id;        // Vehicle ID từ API
     private String name;
     private String details;
     private String batteryPercent;
@@ -14,6 +15,8 @@ public class Vehicle {
     private String condition;
     private String imageUrl;  // URL hình ảnh từ API
     private String brand;     // Brand từ API để filter
+    private double pricePerDay;   // Giá theo ngày (số)
+    private double pricePerHour;  // Giá theo giờ (số)
 
     public Vehicle(String name, String details, String batteryPercent, String range,
                   String seats, String location, String price, String priceDetails,
@@ -69,9 +72,35 @@ public class Vehicle {
         this.condition = condition;
         this.imageUrl = imageUrl;
         this.brand = brand;
+        this.pricePerDay = 0;
+        this.pricePerHour = 0;
+    }
+    
+    // Constructor đầy đủ với ID và prices
+    public Vehicle(String id, String name, String details, String batteryPercent, String range,
+                  String seats, String location, String price, String priceDetails,
+                  String status, String rating, String condition, String imageUrl, String brand,
+                  double pricePerDay, double pricePerHour) {
+        this.id = id;
+        this.name = name;
+        this.details = details;
+        this.batteryPercent = batteryPercent;
+        this.range = range;
+        this.seats = seats;
+        this.location = location;
+        this.price = price;
+        this.priceDetails = priceDetails;
+        this.status = status;
+        this.rating = rating;
+        this.condition = condition;
+        this.imageUrl = imageUrl;
+        this.brand = brand;
+        this.pricePerDay = pricePerDay;
+        this.pricePerHour = pricePerHour;
     }
 
     // Getters
+    public String getId() { return id; }
     public String getName() { return name; }
     public String getDetails() { return details; }
     public String getBatteryPercent() { return batteryPercent; }
@@ -85,8 +114,11 @@ public class Vehicle {
     public String getCondition() { return condition; }
     public String getImageUrl() { return imageUrl; }
     public String getBrand() { return brand; }
+    public double getPricePerDay() { return pricePerDay; }
+    public double getPricePerHour() { return pricePerHour; }
 
     // Setters
+    public void setId(String id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setDetails(String details) { this.details = details; }
     public void setBatteryPercent(String batteryPercent) { this.batteryPercent = batteryPercent; }
@@ -100,4 +132,6 @@ public class Vehicle {
     public void setCondition(String condition) { this.condition = condition; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public void setBrand(String brand) { this.brand = brand; }
+    public void setPricePerDay(double pricePerDay) { this.pricePerDay = pricePerDay; }
+    public void setPricePerHour(double pricePerHour) { this.pricePerHour = pricePerHour; }
 }

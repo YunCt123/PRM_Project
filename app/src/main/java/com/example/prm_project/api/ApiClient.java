@@ -1,7 +1,15 @@
 package com.example.prm_project.api;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.example.prm_project.models.Booking;
+import com.example.prm_project.models.BookingVehicleDefaultPhotosDeserializer;
+import com.example.prm_project.models.DefaultPhotosDeserializer;
+import com.example.prm_project.models.ImageObject;
+import com.example.prm_project.models.ImageObjectDeserializer;
+import com.example.prm_project.models.Vehicle;
+import com.example.prm_project.utils.SessionManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -23,6 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
     private static final String BASE_URL = "https://be-ev-rental-system-production.up.railway.app/";
     private static Retrofit retrofit;
+    private static Retrofit authenticatedRetrofit;
     private static final String MULTIPART_TAG = "MultipartDebug";
 
     public static Retrofit getClient() {
@@ -72,9 +81,12 @@ public class ApiClient {
                     .writeTimeout(120, TimeUnit.SECONDS)
                     .build();
 
-            // Gson configuration
+            // Gson configuration with custom deserializer for ImageObject
             Gson gson = new GsonBuilder()
                     .setLenient()
+                    .registerTypeAdapter(ImageObject.class, new ImageObjectDeserializer())
+                    .registerTypeAdapter(Vehicle.DefaultPhotos.class, new DefaultPhotosDeserializer())
+                    .registerTypeAdapter(Booking.Vehicle.DefaultPhotos.class, new BookingVehicleDefaultPhotosDeserializer())
                     .create();
 
             retrofit = new Retrofit.Builder()
@@ -84,5 +96,46 @@ public class ApiClient {
                     .build();
         }
         return retrofit;
+    }
+
+    public static Retrofit getAuthenticatedClient(Context context) {
+        if (authenticatedRetrofit == null) {
+            // Logging interceptor for debugging
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            // OkHttp client builder with auth interceptor
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(logging)
+                    .addInterceptor(chain -> {
+                        Request original = chain.request();
+                        SessionManager sessionManager = new SessionManager(context);
+                        String token = sessionManager.getToken();
+
+                        Request.Builder requestBuilder = original.newBuilder();
+                        if (token != null && !token.isEmpty()) {
+                            requestBuilder.addHeader("Authorization", "Bearer " + token);
+                        }
+
+                        Request request = requestBuilder.build();
+                        return chain.proceed(request);
+                    })
+                    .build();
+
+            // Gson configuration with custom deserializer for ImageObject
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .registerTypeAdapter(ImageObject.class, new ImageObjectDeserializer())
+                    .registerTypeAdapter(Vehicle.DefaultPhotos.class, new DefaultPhotosDeserializer())
+                    .registerTypeAdapter(Booking.Vehicle.DefaultPhotos.class, new BookingVehicleDefaultPhotosDeserializer())
+                    .create();
+
+            authenticatedRetrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
+        return authenticatedRetrofit;
     }
 }

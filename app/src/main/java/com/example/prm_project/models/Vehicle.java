@@ -148,7 +148,9 @@ public class Vehicle {
 
     public String getMainImageUrl() {
         if (defaultPhotos != null && defaultPhotos.getExterior() != null && !defaultPhotos.getExterior().isEmpty()) {
-            return defaultPhotos.getExterior().get(0).getUrl();
+            Photo photo = defaultPhotos.getExterior().get(0);
+            // Return url if available, otherwise null (handles case when only ID is present)
+            return photo != null ? photo.getUrl() : null;
         }
         return null;
     }

@@ -11,10 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.prm_project.R;
+import com.example.prm_project.activies.VerifyAccountActivity;
+import com.example.prm_project.utils.SessionManager;
 
 import java.util.List;
 
@@ -22,10 +25,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
 
     private List<Vehicle> vehicleList;
     private Context context;
+    private SessionManager sessionManager;
 
     public VehicleAdapter(List<Vehicle> vehicleList, Context context) {
         this.vehicleList = vehicleList;
         this.context = context;
+        this.sessionManager = new SessionManager(context);
     }
 
     @NonNull
@@ -46,6 +51,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         holder.tvPrice.setText(vehicle.getPrice());
         holder.tvPriceDetails.setText(vehicle.getPriceDetails());
         holder.tvStatus.setText(vehicle.getStatus());
+        holder.tvLocation.setText("📍 " + vehicle.getLocation());
+        holder.tvSeats.setText("👥 " + vehicle.getSeats());
 
         // Load image from URL using Glide
         if (vehicle.getImageUrl() != null && !vehicle.getImageUrl().isEmpty()) {
@@ -68,6 +75,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
             
             // Pass vehicle data via intent
+            intent.putExtra("vehicle_id", vehicle.getId());  // Add vehicle ID
             intent.putExtra("vehicle_name", vehicle.getName());
             intent.putExtra("vehicle_details", vehicle.getDetails());
             intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
@@ -80,18 +88,28 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
             
             context.startActivity(intent);
         });
 
         holder.btnBookNow.setOnClickListener(v -> {
-            // Navigate to PaymentActivity
-            Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
+            // Check if user is verified before allowing booking
+            if (!sessionManager.isVerified()) {
+                showVerificationRequiredDialog();
+                return;
+            }
             
+            // User is verified, proceed to payment
+            Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
+
             // Pass vehicle data
+            intent.putExtra("vehicle_id", vehicle.getId());
             intent.putExtra("vehicle_name", vehicle.getName());
-            intent.putExtra("vehicle_price", vehicle.getPrice());
-            intent.putExtra("vehicle_price_details", vehicle.getPriceDetails());
+            intent.putExtra("station_name", vehicle.getLocation());  // Station name
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());
             
             context.startActivity(intent);
         });
@@ -101,6 +119,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             // Same navigation as VIEW button
             Intent intent = new Intent(context, com.example.prm_project.ui.details.DetailActivity.class);
             
+            intent.putExtra("vehicle_id", vehicle.getId());  // Add vehicle ID
             intent.putExtra("vehicle_name", vehicle.getName());
             intent.putExtra("vehicle_details", vehicle.getDetails());
             intent.putExtra("vehicle_battery", vehicle.getBatteryPercent());
@@ -113,6 +132,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_rating", vehicle.getRating());
             intent.putExtra("vehicle_condition", vehicle.getCondition());
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
+            intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
+            intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
             
             context.startActivity(intent);
         });
@@ -121,6 +142,25 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
     @Override
     public int getItemCount() {
         return vehicleList.size();
+    }
+
+    /**
+     * Show dialog when user is not verified
+     */
+    private void showVerificationRequiredDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Yêu cầu xác minh tài khoản")
+                .setMessage("Bạn cần xác minh tài khoản trước khi có thể đặt xe. Vui lòng hoàn tất việc xác minh để tiếp tục.")
+                .setPositiveButton("Xác minh ngay", (dialog, which) -> {
+                    // Navigate to VerifyAccountActivity
+                    Intent verifyIntent = new Intent(context, VerifyAccountActivity.class);
+                    context.startActivity(verifyIntent);
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
     }
 
     public static class VehicleViewHolder extends RecyclerView.ViewHolder {
@@ -132,6 +172,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         TextView tvPrice;
         TextView tvPriceDetails;
         TextView tvStatus;
+        TextView tvLocation;
+        TextView tvSeats;
         Button btnViewDetails;
         Button btnBookNow;
 
@@ -146,6 +188,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             tvPrice = itemView.findViewById(R.id.tv_price);
             tvPriceDetails = itemView.findViewById(R.id.tv_price_details);
             tvStatus = itemView.findViewById(R.id.tv_status);
+            tvLocation = itemView.findViewById(R.id.tv_location);
+            tvSeats = itemView.findViewById(R.id.tv_seats);
             btnViewDetails = itemView.findViewById(R.id.btn_view_details);
             btnBookNow = itemView.findViewById(R.id.btn_book_now);
         }

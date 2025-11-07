@@ -69,6 +69,8 @@ public interface UserApiService {
      * @param licenseBackImage Ảnh mặt sau giấy phép lái xe
      * @param idFrontImage Ảnh mặt trước CMND/CCCD
      * @param idBackImage Ảnh mặt sau CMND/CCCD
+     * @param licenseNumber Số giấy phép lái xe
+     * @param idNumber Số CMND/CCCD
      * @return ApiResponse với User data
      */
     @Multipart
@@ -82,6 +84,8 @@ public interface UserApiService {
             @Part MultipartBody.Part licenseFrontImage,
             @Part MultipartBody.Part licenseBackImage,
             @Part MultipartBody.Part idFrontImage,
-            @Part MultipartBody.Part idBackImage
+            @Part MultipartBody.Part idBackImage,
+            @Part("kyc.licenseNumber") RequestBody licenseNumber,
+            @Part("kyc.idNumber") RequestBody idNumber
     );
 }

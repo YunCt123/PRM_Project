@@ -21,17 +21,22 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.prm_project.R;
 import com.example.prm_project.activies.VerifyAccountActivity;
 import com.example.prm_project.databinding.FragmentProfileBinding;
+import com.example.prm_project.utils.SessionManager;
 
 public class ProfileFragment extends Fragment {
     private static final String TAG = "ProfileFragment";
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
+    private SessionManager sessionManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        
+        // Initialize SessionManager
+        sessionManager = new SessionManager(requireContext());
 
         Log.d(TAG, "ProfileFragment onCreateView");
 
@@ -44,10 +49,6 @@ public class ProfileFragment extends Fragment {
             Log.d(TAG, "Email changed in ViewModel: " + email);
             binding.tvEmail.setText(email);
         });
-
-        // Thống kê chuyến đi, quãng đường
-        profileViewModel.getRidesCount().observe(getViewLifecycleOwner(), count -> binding.tvRidesCount.setText(String.valueOf(count)));
-        profileViewModel.getDistanceKm().observe(getViewLifecycleOwner(), d -> binding.tvDistance.setText(d));
 
         // Observe loading state
         profileViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -89,7 +90,11 @@ public class ProfileFragment extends Fragment {
         // Xác minh tài khoản
         LinearLayout llVerify = root.findViewById(R.id.llVerify);
         ((ImageView) llVerify.findViewById(R.id.ivMenuIcon)).setImageResource(R.drawable.ic_check_black_24dp);
-        ((TextView) llVerify.findViewById(R.id.tvMenuTitle)).setText("Xác minh tài khoản");
+        
+        // Update verification status text
+        TextView tvVerifyTitle = llVerify.findViewById(R.id.tvMenuTitle);
+        updateVerificationStatus(tvVerifyTitle);
+        
         llVerify.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), VerifyAccountActivity.class);
             startActivity(intent);
@@ -122,6 +127,24 @@ public class ProfileFragment extends Fragment {
         llAbout.setOnClickListener(v -> Toast.makeText(getContext(), "Về chúng tôi", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Update verification status display
+     */
+    private void updateVerificationStatus(TextView tvVerifyTitle) {
+        if (sessionManager == null || tvVerifyTitle == null) return;
+        
+        boolean isVerified = sessionManager.isVerified();
+        String kycStatus = sessionManager.getKycStatus();
+        
+        if (isVerified) {
+            tvVerifyTitle.setText("Xác minh tài khoản ✅");
+        } else if ("pending".equalsIgnoreCase(kycStatus)) {
+            tvVerifyTitle.setText("Xác minh tài khoản ⏳");
+        } else {
+            tvVerifyTitle.setText("Xác minh tài khoản");
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -129,6 +152,16 @@ public class ProfileFragment extends Fragment {
         // Reload profile data from API when fragment resumes
         if (profileViewModel != null) {
             profileViewModel.loadUserProfile();
+        }
+        
+        // Update verification status when returning to fragment
+        View root = getView();
+        if (root != null) {
+            LinearLayout llVerify = root.findViewById(R.id.llVerify);
+            if (llVerify != null) {
+                TextView tvVerifyTitle = llVerify.findViewById(R.id.tvMenuTitle);
+                updateVerificationStatus(tvVerifyTitle);
+            }
         }
     }
 
