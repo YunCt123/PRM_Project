@@ -73,12 +73,32 @@ public class PaymentActivity extends AppCompatActivity {
         
         setContentView(R.layout.activity_payment);
         
+        // Initialize repositories
+        sessionManager = new SessionManager(this);
+        
+        // Security check: Ensure user is logged in
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Bạn cần đăng nhập để đặt xe", Toast.LENGTH_SHORT).show();
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginIntent);
+            finish();
+            return;
+        }
+        
+        // Security check: Ensure user is verified
+        if (!sessionManager.isVerified()) {
+            Toast.makeText(this, "Bạn cần xác minh tài khoản để đặt xe", Toast.LENGTH_SHORT).show();
+            Intent verifyIntent = new Intent(this, VerifyAccountActivity.class);
+            startActivity(verifyIntent);
+            finish();
+            return;
+        }
+        
         // Initialize API format timezone
         apiFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         
-        // Initialize repositories
+        // Initialize repository
         bookingRepository = new BookingRepository(this);
-        sessionManager = new SessionManager(this);
         
         // Initialize calendars - default start now, end 1 day later
         startDateTime = Calendar.getInstance();

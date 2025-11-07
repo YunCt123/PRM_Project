@@ -95,13 +95,19 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
         });
 
         holder.btnBookNow.setOnClickListener(v -> {
+            // Check if user is logged in first
+            if (!sessionManager.isLoggedIn()) {
+                showLoginRequiredDialog();
+                return;
+            }
+            
             // Check if user is verified before allowing booking
             if (!sessionManager.isVerified()) {
                 showVerificationRequiredDialog();
                 return;
             }
             
-            // User is verified, proceed to payment
+            // User is logged in and verified, proceed to payment
             Intent intent = new Intent(context, com.example.prm_project.activies.PaymentActivity.class);
 
             // Pass vehicle data
@@ -157,6 +163,25 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
                     context.startActivity(verifyIntent);
                 })
                 .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
+    }
+
+    /**
+     * Show dialog when user is not logged in
+     */
+    private void showLoginRequiredDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Yêu cầu đăng nhập")
+                .setMessage("Bạn cần đăng nhập để đặt xe. Vui lòng đăng nhập để tiếp tục.")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    // Navigate to LoginActivity
+                    Intent loginIntent = new Intent(context, com.example.prm_project.activies.LoginActivity.class);
+                    context.startActivity(loginIntent);
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .setCancelable(true)
