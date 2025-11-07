@@ -17,7 +17,6 @@ import com.example.prm_project.adapters.BookingHistoryAdapter;
 import com.example.prm_project.api.ApiClient;
 import com.example.prm_project.api.BookingApiService;
 import com.example.prm_project.databinding.FragmentBookingHistoryBinding;
-import com.example.prm_project.models.ApiResponse;
 import com.example.prm_project.models.Booking;
 import com.example.prm_project.utils.SessionManager;
 
@@ -61,7 +60,13 @@ public class BookingHistoryFragment extends Fragment {
     private void setupRecyclerView() {
         adapter = new BookingHistoryAdapter(booking -> {
             // Handle booking item click
-            Toast.makeText(getContext(), "Chi tiết: " + booking.getVehicle().getName(), Toast.LENGTH_SHORT).show();
+            if (booking.getVehicle() != null) {
+                String brand = booking.getVehicle().getBrand() != null ? booking.getVehicle().getBrand() : "";
+                String model = booking.getVehicle().getModel() != null ? booking.getVehicle().getModel() : "";
+                Toast.makeText(getContext(), "Chi tiết: " + (brand + " " + model).trim(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Chi tiết: booking", Toast.LENGTH_SHORT).show();
+            }
             // TODO: Navigate to booking detail screen
         });
 
@@ -86,17 +91,18 @@ public class BookingHistoryFragment extends Fragment {
 
         Log.d(TAG, "Loading bookings...");
 
-        Call<ApiResponse<List<Booking>>> call = bookingApiService.getMyBookings(bearerToken);
-        call.enqueue(new Callback<ApiResponse<List<Booking>>>() {
+        // Use default pagination params
+        Call<Booking.BookingListResponse> call = bookingApiService.getMyBookings(bearerToken, 1, 50, null);
+        call.enqueue(new Callback<Booking.BookingListResponse>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Booking>>> call, Response<ApiResponse<List<Booking>>> response) {
+            public void onResponse(Call<Booking.BookingListResponse> call, Response<Booking.BookingListResponse> response) {
                 binding.progressBar.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<Booking>> apiResponse = response.body();
+                    Booking.BookingListResponse apiResponse = response.body();
 
-                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
-                        List<Booking> bookings = apiResponse.getData();
+                    if (apiResponse.getItems() != null) {
+                        List<Booking.BookingItem> bookings = apiResponse.getItems();
                         Log.d(TAG, "Loaded " + bookings.size() + " bookings");
 
                         if (bookings.isEmpty()) {
@@ -110,7 +116,7 @@ public class BookingHistoryFragment extends Fragment {
                             binding.emptyState.setVisibility(View.GONE);
                         }
                     } else {
-                        Log.e(TAG, "API returned error: " + apiResponse.getMessage());
+                        Log.e(TAG, "API returned empty items");
                         showError("Không thể tải lịch sử thuê xe");
                     }
                 } else {
@@ -120,7 +126,7 @@ public class BookingHistoryFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Booking>>> call, Throwable t) {
+            public void onFailure(Call<Booking.BookingListResponse> call, Throwable t) {
                 binding.progressBar.setVisibility(View.GONE);
                 Log.e(TAG, "Network error", t);
                 showError("Lỗi kết nối: " + t.getMessage());
@@ -140,4 +146,3 @@ public class BookingHistoryFragment extends Fragment {
         binding = null;
     }
 }
-

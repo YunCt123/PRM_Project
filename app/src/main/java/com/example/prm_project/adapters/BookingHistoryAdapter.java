@@ -26,11 +26,11 @@ import java.util.Locale;
  */
 public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAdapter.BookingViewHolder> {
 
-    private List<Booking> bookingList;
+    private List<Booking.BookingItem> bookingList;
     private OnBookingClickListener listener;
 
     public interface OnBookingClickListener {
-        void onBookingClick(Booking booking);
+        void onBookingClick(Booking.BookingItem booking);
     }
 
     public BookingHistoryAdapter(OnBookingClickListener listener) {
@@ -38,7 +38,7 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
         this.listener = listener;
     }
 
-    public void setBookings(List<Booking> bookings) {
+    public void setBookings(List<Booking.BookingItem> bookings) {
         this.bookingList = bookings != null ? bookings : new ArrayList<>();
         notifyDataSetChanged();
     }
@@ -53,7 +53,7 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
 
     @Override
     public void onBindViewHolder(@NonNull BookingViewHolder holder, int position) {
-        Booking booking = bookingList.get(position);
+        Booking.BookingItem booking = bookingList.get(position);
         holder.bind(booking);
     }
 
@@ -82,17 +82,21 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
             tvStatus = itemView.findViewById(R.id.tvStatusHistory);
         }
 
-        public void bind(Booking booking) {
+        public void bind(Booking.BookingItem booking) {
             if (booking.getVehicle() != null) {
-                tvVehicleName.setText(booking.getVehicle().getName());
+                Booking.Vehicle vehicle = booking.getVehicle();
 
-                String info = booking.getVehicle().getBrand() + " " +
-                             booking.getVehicle().getModel() + " • " +
-                             booking.getVehicle().getYear();
+                // Vehicle name: brand + model
+                String vehicleName = (vehicle.getBrand() != null ? vehicle.getBrand() : "") +
+                        (vehicle.getModel() != null ? " " + vehicle.getModel() : "");
+                tvVehicleName.setText(vehicleName.trim());
+
+                // Info: plate number
+                String info = "Plate: " + (vehicle.getPlateNumber() != null ? vehicle.getPlateNumber() : "-");
                 tvVehicleInfo.setText(info);
 
-                // Load vehicle image
-                String imageUrl = booking.getVehicle().getFirstImageUrl();
+                // Load vehicle image using getMainImageUrl()
+                String imageUrl = vehicle.getMainImageUrl();
                 if (imageUrl != null && !imageUrl.isEmpty()) {
                     Glide.with(itemView.getContext())
                             .load(imageUrl)
@@ -103,22 +107,27 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
                 } else {
                     ivVehicle.setImageResource(R.drawable.ic_car_placeholder);
                 }
+            } else {
+                tvVehicleName.setText("Unknown vehicle");
+                tvVehicleInfo.setText("-");
+                ivVehicle.setImageResource(R.drawable.ic_car_placeholder);
             }
 
-            // Format date range
-            String dateRange = formatDate(booking.getStartDate()) + " - " + formatDate(booking.getEndDate());
+            // Format date range using startTime/endTime
+            String dateRange = formatDate(booking.getStartTime()) + " - " + formatDate(booking.getEndTime());
             tvDateRange.setText(dateRange);
 
-            // Format price
-            if (booking.getTotalPrice() != null) {
+            // Format price using amounts.grandTotal if available
+            if (booking.getAmounts() != null) {
                 NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-                tvTotalPrice.setText(formatter.format(booking.getTotalPrice()));
+                tvTotalPrice.setText(formatter.format(booking.getAmounts().getGrandTotal()));
             } else {
                 tvTotalPrice.setText("0 ₫");
             }
 
-            // Set status
-            tvStatus.setText(booking.getStatusText());
+            // Set status text (use status field)
+            String statusText = booking.getStatus() != null ? booking.getStatus() : "unknown";
+            tvStatus.setText(statusText);
 
             // Set status color
             int statusColor = getStatusColor(booking.getStatus());
@@ -139,7 +148,7 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
                 Date date = inputFormat.parse(dateString);
                 return outputFormat.format(date);
             } catch (Exception e) {
-                return dateString;
+                return dateString != null ? dateString : "";
             }
         }
 
