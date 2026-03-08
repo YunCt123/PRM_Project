@@ -90,6 +90,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
             intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
             intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
+            intent.putExtra("vehicle_valuation", vehicle.getValuation());
             
             context.startActivity(intent);
         });
@@ -116,6 +117,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("station_name", vehicle.getLocation());  // Station name
             intent.putExtra("price_per_day", vehicle.getPricePerDay());
             intent.putExtra("price_per_hour", vehicle.getPricePerHour());
+            intent.putExtra("vehicle_valuation", vehicle.getValuation());
             
             context.startActivity(intent);
         });
@@ -140,6 +142,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.VehicleV
             intent.putExtra("vehicle_image_url", vehicle.getImageUrl());  // Pass URL thay vì resource ID
             intent.putExtra("price_per_day", vehicle.getPricePerDay());  // Add price per day (số)
             intent.putExtra("price_per_hour", vehicle.getPricePerHour());  // Add price per hour (số)
+            intent.putExtra("vehicle_valuation", vehicle.getValuation());
             
             context.startActivity(intent);
         });

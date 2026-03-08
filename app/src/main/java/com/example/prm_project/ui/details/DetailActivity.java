@@ -27,6 +27,7 @@ public class DetailActivity extends AppCompatActivity {
     private String vehicleId;
     private double pricePerDay;
     private double pricePerHour;
+    private double vehicleValuation;
     private SessionManager sessionManager;
 
     @Override
@@ -49,6 +50,7 @@ public class DetailActivity extends AppCompatActivity {
             vehicleId = intent.getStringExtra("vehicle_id");
             pricePerDay = intent.getDoubleExtra("price_per_day", 0);
             pricePerHour = intent.getDoubleExtra("price_per_hour", 0);
+            vehicleValuation = intent.getDoubleExtra("vehicle_valuation", 0);
             
             vehicleId = intent.getStringExtra("vehicle_id");
             vehicleImageUrl = intent.getStringExtra("vehicle_image_url");
@@ -154,6 +156,7 @@ public class DetailActivity extends AppCompatActivity {
             // Pass prices (số thực)
             paymentIntent.putExtra("price_per_day", pricePerDay);
             paymentIntent.putExtra("price_per_hour", pricePerHour);
+            paymentIntent.putExtra("vehicle_valuation", vehicleValuation);
             
             startActivity(paymentIntent);
         });
