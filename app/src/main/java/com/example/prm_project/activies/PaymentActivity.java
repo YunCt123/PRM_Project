@@ -324,6 +324,9 @@ public class PaymentActivity extends AppCompatActivity {
         
         // Calculate total price based on days and hours
         double rentalPrice = (days * unitPricePerDay) + (hours * unitPricePerHour);
+        // Deposit = 15% of rental price, rounded to nearest integer
+        double calculatedDeposit = Math.ceil(rentalPrice * 0.15 / 1000) * 1000;
+        depositAmount = Math.max(2000, calculatedDeposit);
         totalPrice = rentalPrice + depositAmount;
         
         // Unit price display

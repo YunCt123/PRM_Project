@@ -17,6 +17,7 @@ public class Vehicle {
     private String brand;     // Brand từ API để filter
     private double pricePerDay;   // Giá theo ngày (số)
     private double pricePerHour;  // Giá theo giờ (số)
+    private double valuation;     // Giá trị xe (VND)
 
     public Vehicle(String name, String details, String batteryPercent, String range,
                   String seats, String location, String price, String priceDetails,
@@ -116,6 +117,7 @@ public class Vehicle {
     public String getBrand() { return brand; }
     public double getPricePerDay() { return pricePerDay; }
     public double getPricePerHour() { return pricePerHour; }
+    public double getValuation() { return valuation; }
 
     // Setters
     public void setId(String id) { this.id = id; }
@@ -134,4 +136,5 @@ public class Vehicle {
     public void setBrand(String brand) { this.brand = brand; }
     public void setPricePerDay(double pricePerDay) { this.pricePerDay = pricePerDay; }
     public void setPricePerHour(double pricePerHour) { this.pricePerHour = pricePerHour; }
+    public void setValuation(double valuation) { this.valuation = valuation; }
 }
