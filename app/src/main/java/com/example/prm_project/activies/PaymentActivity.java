@@ -42,6 +42,7 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView tvEndDateTimeLabel, tvHourlyDurationLabel;
     private EditText etHourlyDuration;
     private TextView tvUnitPrice, tvRentalDuration, tvTotalPrice;
+    private TextView tvRentalPrice, tvDepositAmount;
     private RadioGroup rgRentalType;
     private RadioButton rbDaily, rbHourly;
     private MaterialButton btnProceedPayment;
@@ -53,6 +54,8 @@ public class PaymentActivity extends AppCompatActivity {
     private double unitPricePerDay; // 150đ/ngày
     private boolean isDaily = true;
     private double totalPrice;
+    private double depositAmount;
+    private double vehicleValuation;
     
     // For API booking
     private Calendar startDateTime;
@@ -127,6 +130,8 @@ public class PaymentActivity extends AppCompatActivity {
         tvPickupLocation = findViewById(R.id.tvPickupLocation);
         tvUnitPrice = findViewById(R.id.tvUnitPrice);
         tvRentalDuration = findViewById(R.id.tvRentalDuration);
+        tvRentalPrice = findViewById(R.id.tvRentalPrice);
+        tvDepositAmount = findViewById(R.id.tvDepositAmount);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         rgRentalType = findViewById(R.id.rgRentalType);
         rbDaily = findViewById(R.id.rbDaily);
@@ -150,6 +155,10 @@ public class PaymentActivity extends AppCompatActivity {
         if (pricePerHour > 0) {
             unitPricePerHour = pricePerHour;
         }
+        
+        // Get vehicle valuation for deposit calculation (deposit = 5% of valuation)
+        vehicleValuation = intent.getDoubleExtra("vehicle_valuation", 0);
+        depositAmount = vehicleValuation * 0.05;
         
         // Set default values if not provided
         if (vehicleName == null) vehicleName = "VinFast VF8";
@@ -314,7 +323,8 @@ public class PaymentActivity extends AppCompatActivity {
         tvRentalDuration.setText(durationText);
         
         // Calculate total price based on days and hours
-        totalPrice = (days * unitPricePerDay) + (hours * unitPricePerHour);
+        double rentalPrice = (days * unitPricePerDay) + (hours * unitPricePerHour);
+        totalPrice = rentalPrice + depositAmount;
         
         // Unit price display
         if (isDaily) {
@@ -323,7 +333,13 @@ public class PaymentActivity extends AppCompatActivity {
             tvUnitPrice.setText(formatter.format(unitPricePerHour) + " ₫/giờ");
         }
         
-        // Total price
+        // Rental price
+        tvRentalPrice.setText(formatter.format(rentalPrice) + " ₫");
+        
+        // Deposit amount
+        tvDepositAmount.setText(formatter.format(depositAmount) + " ₫");
+        
+        // Total price (rental + deposit)
         tvTotalPrice.setText(formatter.format(totalPrice) + " ₫");
         
         // Enable/disable button

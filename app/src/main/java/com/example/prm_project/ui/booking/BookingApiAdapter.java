@@ -99,8 +99,11 @@ public class BookingApiAdapter extends RecyclerView.Adapter<BookingApiAdapter.Bo
             holder.tvReturnTime.setText("--:--");
         }
         
-        // Total price
-        if (booking.getDeposit() != null) {
+        // Total price - show grandTotal from amounts (includes rental + deposit)
+        if (booking.getAmounts() != null && booking.getAmounts().getGrandTotal() > 0) {
+            java.text.NumberFormat formatter = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
+            holder.tvTotalPrice.setText(formatter.format(booking.getAmounts().getGrandTotal()) + " VND");
+        } else if (booking.getDeposit() != null) {
             holder.tvTotalPrice.setText(booking.getDeposit().getAmount() + " VND");
         } else {
             holder.tvTotalPrice.setText("0 VND");
