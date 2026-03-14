@@ -8,6 +8,7 @@ import com.example.prm_project.models.ApiResponse;
 import com.example.prm_project.models.AuthData;
 import com.example.prm_project.models.AuthRequest;
 import com.example.prm_project.models.User;
+import com.google.gson.Gson;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -18,6 +19,7 @@ import retrofit2.Response;
  */
 public class AuthRepository {
     private static final String TAG = "AuthRepository";
+    private static final Gson gson = new Gson();
     private AuthApiService apiService;
 
     public AuthRepository() {
@@ -90,10 +92,67 @@ public class AuthRepository {
             Log.e(TAG, action + " error: " + errorMsg);
             callback.onError(errorMsg);
         } else {
-            String errorMsg = getHttpErrorMessage(response.code());
+            String errorMsg = parseErrorMessage(response, action);
             Log.e(TAG, action + " failed: " + errorMsg);
             callback.onError(errorMsg);
         }
+    }
+
+    private String parseErrorMessage(Response<?> response, String action) {
+        try {
+            if (response.errorBody() != null) {
+                String rawError = response.errorBody().string();
+                Log.e(TAG, action + " error body: " + rawError);
+
+                ApiResponse<?> apiError = gson.fromJson(rawError, ApiResponse.class);
+                if (apiError != null) {
+                    String message = apiError.getError();
+                    if (message == null || message.trim().isEmpty()) {
+                        message = apiError.getMessage();
+                    }
+                    if (message != null && !message.trim().isEmpty()) {
+                        return normalizeDuplicateMessage(message);
+                    }
+                }
+
+                if (rawError != null && !rawError.trim().isEmpty()) {
+                    return normalizeDuplicateMessage(rawError);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Cannot parse error response", e);
+        }
+
+        return getHttpErrorMessage(response.code());
+    }
+
+    private String normalizeDuplicateMessage(String rawMessage) {
+        String message = rawMessage.trim();
+        String lowerMessage = message.toLowerCase();
+
+        boolean duplicateSignal =
+                lowerMessage.contains("duplicate") ||
+                lowerMessage.contains("already") ||
+                lowerMessage.contains("exists") ||
+                lowerMessage.contains("đã được sử dụng") ||
+                lowerMessage.contains("đã tồn tại");
+
+        boolean hasEmail = lowerMessage.contains("email");
+        boolean hasPhone =
+                lowerMessage.contains("phone") ||
+                lowerMessage.contains("số điện thoại");
+
+        if (duplicateSignal && hasEmail && hasPhone) {
+            return "Email hoặc số điện thoại đã được sử dụng";
+        }
+        if (duplicateSignal && hasPhone) {
+            return "Số điện thoại đã được sử dụng";
+        }
+        if (duplicateSignal && hasEmail) {
+            return "Email đã được sử dụng";
+        }
+
+        return message;
     }
 
     private String getHttpErrorMessage(int code) {

@@ -27,6 +27,9 @@
     <string name="sign_up">Đăng ký</string>
     <string name="full_name_hint">Nhập họ và tên</string>
     <string name="phone_hint">Nhập số điện thoại</string>
+    <string name="gender_label">Giới tính</string>
+    <string name="gender_male">Nam</string>
+    <string name="gender_female">Nữ</string>
     <string name="confirm_password_hint">Xác nhận mật khẩu</string>
     <string name="terms_conditions">Tôi đồng ý với Điều khoản và Điều kiện</string>
     <string name="signin_text">Đã có tài khoản? Đăng nhập</string>
