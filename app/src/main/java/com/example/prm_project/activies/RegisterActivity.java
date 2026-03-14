@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private ImageView ivBack;
     private TextInputEditText etFullName, etEmail, etPhone, etPassword, etConfirmPassword;
+    private RadioGroup rgGender;
+    private RadioButton rbMale, rbFemale;
     private CheckBox cbTerms;
     private MaterialButton btnSignUp;
     private TextView tvSignIn;
@@ -46,11 +50,17 @@ public class RegisterActivity extends AppCompatActivity {
         etFullName = findViewById(R.id.et_full_name);
         etEmail = findViewById(R.id.et_email);
         etPhone = findViewById(R.id.et_phone);
+        rgGender = findViewById(R.id.rg_gender);
+        rbMale = findViewById(R.id.rb_male);
+        rbFemale = findViewById(R.id.rb_female);
         etPassword = findViewById(R.id.et_password);
         etConfirmPassword = findViewById(R.id.et_confirm_password);
         cbTerms = findViewById(R.id.cb_terms);
         btnSignUp = findViewById(R.id.btn_sign_up);
         tvSignIn = findViewById(R.id.tv_sign_in);
+
+        // Default gender selection to avoid sending null/empty value.
+        rbMale.setChecked(true);
     }
 
     private void setClickListeners() {
@@ -97,6 +107,12 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        String selectedGender = getSelectedGender();
+        if (selectedGender.isEmpty()) {
+            Toast.makeText(this, "Vui lòng chọn giới tính", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (password.isEmpty()) {
             etPassword.setError("Enter password");
             etPassword.requestFocus();
@@ -128,8 +144,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         showProgressDialog("Đăng ký...");
         
-        // Gọi API register - gender mặc định "male", role mặc định "renter"
-        authRepository.register(fullName, email, password, phone, "male", "renter", 
+        // Gọi API register - role mặc định "renter"
+        authRepository.register(fullName, email, password, phone, selectedGender, "renter", 
             new AuthRepository.AuthCallback() {
                 @Override
                 public void onSuccess(User user, String token) {
@@ -142,9 +158,28 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onError(String errorMessage) {
                     dismissProgressDialog();
+                    String normalizedError = errorMessage != null ? errorMessage.toLowerCase() : "";
+                    if (normalizedError.contains("email")) {
+                        etEmail.setError(errorMessage);
+                        etEmail.requestFocus();
+                    } else if (normalizedError.contains("số điện thoại") || normalizedError.contains("phone")) {
+                        etPhone.setError(errorMessage);
+                        etPhone.requestFocus();
+                    }
                     Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                 }
             });
+    }
+
+    private String getSelectedGender() {
+        int checkedId = rgGender.getCheckedRadioButtonId();
+        if (checkedId == R.id.rb_male) {
+            return "male";
+        }
+        if (checkedId == R.id.rb_female) {
+            return "female";
+        }
+        return "";
     }
     
     private void navigateToMain() {
